@@ -2,17 +2,74 @@ export async function fetchContests(supabase) {
   return supabase.from("contests").select("id, name, slug, owner_user_id").order("name");
 }
 
+function buildAuthRequiredError(message) {
+  return Object.assign(new Error(message), { code: "AUTH_REQUIRED" });
+}
+
+function buildRlsError(message, cause) {
+  return Object.assign(new Error(message), { code: cause?.code ?? "42501", cause });
+}
+
 /**
  * Concurso personalizado (slug único gerado).
  * @param {import("@supabase/supabase-js").SupabaseClient} supabase
  * @param {{ name: string, ownerUserId: string }} p
  */
 export async function createUserContest(supabase, { name, ownerUserId }) {
+  const trimmedName = name?.trim();
+  if (!trimmedName) {
+    return { data: null, error: new Error("Nome inválido") };
+  }
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError) {
+    return { data: null, error: userError };
+  }
+
+  const resolvedOwnerUserId = user?.id ?? ownerUserId ?? null;
+  if (!resolvedOwnerUserId) {
+    return {
+      data: null,
+      error: buildAuthRequiredError("Sua sessão expirou. Entre novamente para criar um concurso."),
+    };
+  }
+
   const slug = `u-${crypto.randomUUID()}`;
+  const insertPayload = {
+    name: trimmedName,
+    slug,
+    owner_user_id: resolvedOwnerUserId,
+  };
+
+  // Evita depender de RETURNING na mesma chamada do insert em ambientes com RLS mais rígido.
+  const insertResponse = await supabase.from("contests").insert(insertPayload);
+  if (insertResponse.error) {
+    const isRlsError =
+      insertResponse.error.code === "42501" ||
+      /row-level security/i.test(insertResponse.error.message || "");
+
+    if (isRlsError) {
+      return {
+        data: null,
+        error: buildRlsError(
+          "Seu usuário autenticado não conseguiu gravar este concurso. Faça login novamente e tente de novo.",
+          insertResponse.error
+        ),
+      };
+    }
+
+    return { data: null, error: insertResponse.error };
+  }
+
   return supabase
     .from("contests")
-    .insert({ name: name.trim(), slug, owner_user_id: ownerUserId })
     .select("id, name, slug, owner_user_id")
+    .eq("slug", slug)
+    .eq("owner_user_id", resolvedOwnerUserId)
     .maybeSingle();
 }
 
