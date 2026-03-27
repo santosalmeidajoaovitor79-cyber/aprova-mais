@@ -86,8 +86,6 @@ function OnboardingModalComponent({ open, user, contests, studyApi, onFinished }
     setLocalError("");
   }, [open]);
 
-  if (!open || !user) return null;
-
   const contestLabel = useMemo(() => {
     if (contestMode === "custom") return customName.trim();
     const found = contests.find((item) => item.id === pickedContestId);
@@ -160,6 +158,8 @@ function OnboardingModalComponent({ open, user, contests, studyApi, onFinished }
 
   const currentStep = steps[step];
   const isLastStep = step === steps.length - 1;
+
+  if (!open || !user) return null;
 
   async function handleCreateCustom() {
     setLocalError("");
