@@ -2,26 +2,119 @@
  * @param {import("@supabase/supabase-js").SupabaseClient} supabase
  * @param {{ userId: string, topicId: string, contestId?: string | null, subjectId?: string | null }} row
  */
+function isMissingColumnError(error, columnName) {
+  const code = String(error?.code ?? "").trim();
+  const message = String(error?.message ?? "").toLowerCase();
+  return code === "42703" && message.includes(`column`) && message.includes(String(columnName).toLowerCase());
+}
+
+function logActivityFallback(label, error) {
+  console.warn(`[studyActivityApi] ${label}`, {
+    code: error?.code ?? "",
+    message: error?.message ?? "",
+  });
+}
+
+async function fetchTopicRowsByIds(supabase, topicIds) {
+  const ids = [...new Set((topicIds ?? []).filter(Boolean))];
+  if (!ids.length) return { data: [], error: null };
+  return supabase.from("topics").select("id, subject_id").in("id", ids);
+}
+
+async function attachSubjectIdsFromTopics(supabase, rows) {
+  const list = Array.isArray(rows) ? rows : [];
+  if (!list.length) return { data: [], error: null };
+  const topicIds = [...new Set(list.map((row) => row?.topic_id).filter(Boolean))];
+  const { data: topicRows, error } = await fetchTopicRowsByIds(supabase, topicIds);
+  if (error) return { data: list, error };
+  const subjectByTopicId = Object.fromEntries((topicRows ?? []).map((row) => [row.id, row.subject_id ?? null]));
+  return {
+    data: list.map((row) => ({
+      ...row,
+      subject_id: row?.subject_id ?? subjectByTopicId[row?.topic_id] ?? null,
+    })),
+    error: null,
+  };
+}
+
+async function fetchTopicIdsForContest(supabase, contestId) {
+  if (!contestId) return { data: [], error: null };
+  const { data: subjects, error: subjectError } = await supabase
+    .from("subjects")
+    .select("id")
+    .eq("contest_id", contestId);
+  if (subjectError) return { data: [], error: subjectError };
+  const subjectIds = (subjects ?? []).map((row) => row.id).filter(Boolean);
+  if (!subjectIds.length) return { data: [], error: null };
+  const { data: topics, error: topicError } = await supabase
+    .from("topics")
+    .select("id")
+    .in("subject_id", subjectIds);
+  if (topicError) return { data: [], error: topicError };
+  return { data: (topics ?? []).map((row) => row.id).filter(Boolean), error: null };
+}
+
 export async function upsertTopicVisit(supabase, { userId, topicId, contestId, subjectId }) {
-  return supabase.from("user_topic_visits").upsert(
-    {
-      user_id: userId,
-      topic_id: topicId,
-      contest_id: contestId ?? null,
-      subject_id: subjectId ?? null,
-      visited_at: new Date().toISOString(),
-    },
-    { onConflict: "user_id,topic_id" }
-  );
+  const baseRow = {
+    user_id: userId,
+    topic_id: topicId,
+    subject_id: subjectId ?? null,
+    visited_at: new Date().toISOString(),
+  };
+
+  let response = await supabase
+    .from("user_topic_visits")
+    .upsert(
+      {
+        ...baseRow,
+        contest_id: contestId ?? null,
+      },
+      { onConflict: "user_id,topic_id" }
+    );
+
+  if (!response.error) return response;
+  if (!isMissingColumnError(response.error, "contest_id")) return response;
+
+  logActivityFallback("contest_id ausente em user_topic_visits; gravando sem este campo.", response.error);
+  response = await supabase.from("user_topic_visits").upsert(baseRow, { onConflict: "user_id,topic_id" });
+
+  if (!response.error || !isMissingColumnError(response.error, "subject_id")) return response;
+
+  logActivityFallback("subject_id ausente em user_topic_visits; gravando só topic_id.", response.error);
+  return supabase
+    .from("user_topic_visits")
+    .upsert(
+      {
+        user_id: userId,
+        topic_id: topicId,
+        visited_at: baseRow.visited_at,
+      },
+      { onConflict: "user_id,topic_id" }
+    );
 }
 
 export async function fetchRecentVisits(supabase, userId, limit = 8) {
-  return supabase
+  let response = await supabase
     .from("user_topic_visits")
-    .select("topic_id, visited_at, contest_id, subject_id")
+    .select("topic_id, visited_at, subject_id")
     .eq("user_id", userId)
     .order("visited_at", { ascending: false })
     .limit(limit);
+
+  if (!response.error) return response;
+  if (!isMissingColumnError(response.error, "subject_id")) return response;
+
+  logActivityFallback("subject_id ausente em user_topic_visits; enriquecendo via topics.", response.error);
+  response = await supabase
+    .from("user_topic_visits")
+    .select("topic_id, visited_at")
+    .eq("user_id", userId)
+    .order("visited_at", { ascending: false })
+    .limit(limit);
+  if (response.error) return response;
+
+  const enriched = await attachSubjectIdsFromTopics(supabase, response.data ?? []);
+  return { data: enriched.data ?? [], error: enriched.error };
 }
 
 export async function fetchTopicNames(supabase, topicIds) {
@@ -57,11 +150,14 @@ export async function countTopicsInContest(supabase, contestId) {
 /** Tópicos distintos visitados neste concurso. */
 export async function fetchVisitedTopicIdsForContest(supabase, userId, contestId) {
   if (!contestId) return { data: [], error: null };
+  const { data: topicIds, error: topicErr } = await fetchTopicIdsForContest(supabase, contestId);
+  if (topicErr) return { data: [], error: topicErr };
+  if (!topicIds.length) return { data: [], error: null };
   return supabase
     .from("user_topic_visits")
     .select("topic_id")
     .eq("user_id", userId)
-    .eq("contest_id", contestId);
+    .in("topic_id", topicIds);
 }
 
 export async function fetchVisitTimestamps(supabase, userId, limit = 400) {
@@ -76,11 +172,14 @@ export async function fetchVisitTimestamps(supabase, userId, limit = 400) {
 /** Visitas só do concurso principal (frequência / hábito + tópicos recentes para simulado adaptativo). */
 export async function fetchVisitTimestampsForContest(supabase, userId, contestId, limit = 500) {
   if (!contestId) return { data: [], error: null };
+  const { data: topicIds, error: topicErr } = await fetchTopicIdsForContest(supabase, contestId);
+  if (topicErr) return { data: [], error: topicErr };
+  if (!topicIds.length) return { data: [], error: null };
   return supabase
     .from("user_topic_visits")
     .select("topic_id, visited_at")
     .eq("user_id", userId)
-    .eq("contest_id", contestId)
+    .in("topic_id", topicIds)
     .order("visited_at", { ascending: false })
     .limit(limit);
 }

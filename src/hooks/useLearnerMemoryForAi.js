@@ -56,8 +56,8 @@ export function useLearnerMemoryForAi(supabase, userId, contestId, refreshNonce 
       const rawAttempts = attemptsRes.data ?? [];
       const inScope = rawAttempts.filter((r) => r?.topic_id && topicSet.has(r.topic_id));
 
-      const visits = visitsRes.data ?? [];
-      const wrongRows = wrongRes.data ?? [];
+      const visits = visitsRes.error ? [] : (visitsRes.data ?? []);
+      const wrongRows = wrongRes.error ? [] : (wrongRes.data ?? []);
 
       const wrongSamples = wrongRows.map((r) => ({
         topic_id: r.topic_id,

@@ -120,6 +120,7 @@ export function useDashboardStudy(supabase, session, { examDate, mainExamId, hou
       );
       const studiedSet = new Set((visited ?? []).map((r) => r.topic_id).filter(Boolean));
       if (!vErr) setTopicsStudiedMain(studiedSet.size);
+      else setTopicsStudiedMain(0);
 
       const { data: streakRows, error: streakErr } = await activityApi.fetchVisitRowsForStreak(
         supabase,
@@ -621,6 +622,28 @@ export function useDashboardStudy(supabase, session, { examDate, mainExamId, hou
       } else {
         setContinueProgressLine("");
       }
+    } catch (error) {
+      console.error("Erro ao atualizar o dashboard de estudo:", error);
+      setTopicsTotal(0);
+      setTopicsStudiedMain(0);
+      setQuestionSends(0);
+      setQuizAttempts(0);
+      setQuizCorrect(0);
+      setQuizWrong(0);
+      setStudyDays(0);
+      setRecentRows([]);
+      setSuggestion("");
+      setPlanLines([]);
+      setContinueProgressLine("");
+      setStudyStreak(0);
+      setDailyMissions([]);
+      setEvolutionLines([]);
+      setSuggestedStudyRoute(null);
+      setOverallProgressPct(0);
+      setSubjectProgress([]);
+      setAdaptiveFocusHint("");
+      setSuggestedNextTopicName("");
+      setSuggestedNextSubjectName("");
     } finally {
       setLoading(false);
     }
