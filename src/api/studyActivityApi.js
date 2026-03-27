@@ -94,23 +94,13 @@ export async function upsertTopicVisit(supabase, { userId, topicId, contestId, s
 }
 
 export async function fetchRecentVisits(supabase, userId, limit = 8) {
-  let response = await supabase
-    .from("user_topic_visits")
-    .select("topic_id, visited_at, subject_id")
-    .eq("user_id", userId)
-    .order("visited_at", { ascending: false })
-    .limit(limit);
-
-  if (!response.error) return response;
-  if (!isMissingColumnError(response.error, "subject_id")) return response;
-
-  logActivityFallback("subject_id ausente em user_topic_visits; enriquecendo via topics.", response.error);
-  response = await supabase
+  const response = await supabase
     .from("user_topic_visits")
     .select("topic_id, visited_at")
     .eq("user_id", userId)
     .order("visited_at", { ascending: false })
     .limit(limit);
+
   if (response.error) return response;
 
   const enriched = await attachSubjectIdsFromTopics(supabase, response.data ?? []);
