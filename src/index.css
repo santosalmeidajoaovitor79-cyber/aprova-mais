@@ -11677,3 +11677,762 @@ option {
     height: 180px;
   }
 }
+
+/* —— Landing premium: motion e profundidade —— */
+
+.aprova-landing-shell::before,
+.aprova-landing-shell::after {
+  content: "";
+  position: absolute;
+  inset: auto;
+  pointer-events: none;
+  filter: blur(60px);
+  opacity: 0.45;
+  will-change: transform, opacity;
+}
+
+.aprova-landing-shell::before {
+  top: 8%;
+  left: -10%;
+  width: 34rem;
+  height: 34rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(122, 92, 255, 0.22) 0%, rgba(122, 92, 255, 0) 68%);
+  animation: aprova-aurora-drift-a 20s ease-in-out infinite alternate;
+}
+
+.aprova-landing-shell::after {
+  right: -8%;
+  top: 18%;
+  width: 28rem;
+  height: 28rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(110, 231, 255, 0.18) 0%, rgba(110, 231, 255, 0) 70%);
+  animation: aprova-aurora-drift-b 24s ease-in-out infinite alternate;
+}
+
+.aprova-landing-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 22%, rgba(130, 96, 255, 0.12), transparent 20%),
+    radial-gradient(circle at 78% 28%, rgba(110, 231, 255, 0.09), transparent 16%),
+    radial-gradient(circle at 48% 70%, rgba(255, 255, 255, 0.04), transparent 20%);
+  opacity: 0.8;
+  animation: aprova-bg-breathe 16s ease-in-out infinite alternate;
+}
+
+.aprova-landing-particle {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(233, 227, 255, 0.72);
+  box-shadow: 0 0 18px rgba(173, 148, 255, 0.32);
+  opacity: 0.55;
+  will-change: transform, opacity;
+  animation: aprova-particle-drift 13s linear infinite;
+}
+
+.aprova-landing-particle.particle-a {
+  top: 16%;
+  left: 10%;
+  animation-delay: -2s;
+}
+
+.aprova-landing-particle.particle-b {
+  top: 28%;
+  left: 82%;
+  width: 6px;
+  height: 6px;
+  animation-delay: -7s;
+}
+
+.aprova-landing-particle.particle-c {
+  top: 58%;
+  left: 16%;
+  width: 4px;
+  height: 4px;
+  animation-delay: -1s;
+}
+
+.aprova-landing-particle.particle-d {
+  top: 72%;
+  left: 74%;
+  animation-delay: -9s;
+}
+
+.aprova-landing-particle.particle-e {
+  top: 84%;
+  left: 32%;
+  width: 7px;
+  height: 7px;
+  animation-delay: -5s;
+}
+
+.aprova-landing-particle.particle-f {
+  top: 40%;
+  left: 58%;
+  width: 4px;
+  height: 4px;
+  animation-delay: -11s;
+}
+
+.aprova-landing-brand--animated,
+.aprova-landing-kicker--animated,
+.aprova-landing-headline,
+.aprova-landing-subheadline,
+.aprova-landing-pill-row,
+.aprova-landing-cta-row,
+.aprova-landing-hero-visual--animated {
+  opacity: 0;
+  transform: translateY(18px);
+  will-change: transform, opacity;
+  animation: aprova-hero-rise 780ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.aprova-landing-brand--animated {
+  animation-delay: 0.06s;
+}
+
+.aprova-landing-kicker--animated {
+  animation-delay: 0.14s;
+}
+
+.aprova-landing-headline {
+  animation-delay: 0.24s;
+}
+
+.aprova-landing-subheadline {
+  animation-delay: 0.36s;
+}
+
+.aprova-landing-pill-row {
+  animation-delay: 0.48s;
+}
+
+.aprova-landing-cta-row {
+  animation-delay: 0.6s;
+}
+
+.aprova-landing-hero-visual--animated {
+  transform: translateY(24px) scale(0.985);
+  animation-delay: 0.32s;
+}
+
+.aprova-landing-pill-row .aprova-landing-pill {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: aprova-pill-rise 680ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.aprova-landing-pill-row .aprova-landing-pill:nth-child(1) {
+  animation-delay: 0.58s;
+}
+
+.aprova-landing-pill-row .aprova-landing-pill:nth-child(2) {
+  animation-delay: 0.66s;
+}
+
+.aprova-landing-pill-row .aprova-landing-pill:nth-child(3) {
+  animation-delay: 0.74s;
+}
+
+.aprova-orbit-card {
+  animation: aprova-card-float 9s ease-in-out infinite;
+  will-change: transform;
+}
+
+.aprova-orbit-card::before {
+  animation: aprova-orbit-spin 24s linear infinite;
+  transform-origin: center;
+}
+
+.aprova-orbit-card::after {
+  animation: aprova-orbit-spin-reverse 18s linear infinite;
+  transform-origin: center;
+}
+
+.aprova-orbit-core {
+  will-change: transform, box-shadow;
+  animation: aprova-core-pulse 6.4s ease-in-out infinite;
+}
+
+.aprova-orbit-node {
+  will-change: transform;
+  transition:
+    transform 220ms ease,
+    border-color 220ms ease,
+    background 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.aprova-orbit-node.node-top {
+  animation: aprova-node-float-top 7s ease-in-out infinite;
+}
+
+.aprova-orbit-node.node-right {
+  animation: aprova-node-float-right 8s ease-in-out infinite;
+}
+
+.aprova-orbit-node.node-bottom {
+  animation: aprova-node-float-bottom 7.6s ease-in-out infinite;
+}
+
+.aprova-orbit-node.node-left {
+  animation: aprova-node-float-left 8.4s ease-in-out infinite;
+}
+
+.aprova-orbit-status {
+  will-change: transform;
+  animation: aprova-status-float 8.5s ease-in-out infinite;
+}
+
+.aprova-orbit-status-bottom {
+  animation-delay: -3.4s;
+}
+
+.aprova-landing-primary,
+.aprova-landing-secondary,
+.aprova-landing-pill,
+.aprova-feature-card,
+.aprova-yara-panel-card,
+.aprova-flow-step {
+  transition:
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    background 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.aprova-landing-primary:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 24px 44px rgba(103, 83, 255, 0.34),
+    0 0 28px rgba(110, 231, 255, 0.12);
+}
+
+.aprova-landing-secondary:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
+}
+
+.aprova-landing-pill:hover {
+  transform: translateY(-1px);
+  border-color: rgba(191, 168, 255, 0.22);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.aprova-feature-card:hover,
+.aprova-yara-panel-card:hover,
+.aprova-flow-step:hover {
+  transform: translateY(-4px);
+  border-color: rgba(191, 168, 255, 0.18);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.24);
+}
+
+.aprova-feature-card:hover .aprova-feature-icon {
+  transform: scale(1.04);
+  background: rgba(120, 86, 255, 0.18);
+  box-shadow: 0 10px 24px rgba(120, 86, 255, 0.18);
+}
+
+.aprova-feature-icon {
+  transition:
+    transform 220ms ease,
+    background 220ms ease,
+    box-shadow 220ms ease;
+}
+
+@keyframes aprova-hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes aprova-pill-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes aprova-card-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes aprova-orbit-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes aprova-orbit-spin-reverse {
+  from {
+    transform: rotate(360deg);
+  }
+
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes aprova-core-pulse {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow: 0 0 80px rgba(129, 98, 255, 0.22);
+  }
+
+  50% {
+    transform: translate(-50%, -50%) scale(1.04);
+    box-shadow:
+      0 0 96px rgba(129, 98, 255, 0.28),
+      0 0 28px rgba(110, 231, 255, 0.12);
+  }
+}
+
+@keyframes aprova-node-float-top {
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  50% {
+    transform: translateX(-50%) translateY(-8px);
+  }
+}
+
+@keyframes aprova-node-float-right {
+  0%,
+  100% {
+    transform: translateY(-50%) translateX(0);
+  }
+
+  50% {
+    transform: translateY(-50%) translateX(8px);
+  }
+}
+
+@keyframes aprova-node-float-bottom {
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  50% {
+    transform: translateX(-50%) translateY(8px);
+  }
+}
+
+@keyframes aprova-node-float-left {
+  0%,
+  100% {
+    transform: translateY(-50%) translateX(0);
+  }
+
+  50% {
+    transform: translateY(-50%) translateX(-8px);
+  }
+}
+
+@keyframes aprova-status-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes aprova-particle-drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.9);
+    opacity: 0.18;
+  }
+
+  25% {
+    opacity: 0.55;
+  }
+
+  50% {
+    transform: translate3d(10px, -18px, 0) scale(1.08);
+    opacity: 0.72;
+  }
+
+  100% {
+    transform: translate3d(-8px, -36px, 0) scale(0.94);
+    opacity: 0.14;
+  }
+}
+
+@keyframes aprova-bg-breathe {
+  from {
+    opacity: 0.56;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0.9;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes aprova-aurora-drift-a {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  to {
+    transform: translate3d(42px, 28px, 0) scale(1.1);
+  }
+}
+
+@keyframes aprova-aurora-drift-b {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  to {
+    transform: translate3d(-36px, 20px, 0) scale(1.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aprova-landing-shell::before,
+  .aprova-landing-shell::after,
+  .aprova-landing-bg::before,
+  .aprova-landing-particle,
+  .aprova-landing-brand--animated,
+  .aprova-landing-kicker--animated,
+  .aprova-landing-headline,
+  .aprova-landing-subheadline,
+  .aprova-landing-pill-row,
+  .aprova-landing-pill-row .aprova-landing-pill,
+  .aprova-landing-cta-row,
+  .aprova-landing-hero-visual--animated,
+  .aprova-orbit-card,
+  .aprova-orbit-card::before,
+  .aprova-orbit-card::after,
+  .aprova-orbit-core,
+  .aprova-orbit-node,
+  .aprova-orbit-status {
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+
+  .aprova-landing-primary,
+  .aprova-landing-secondary,
+  .aprova-landing-pill,
+  .aprova-feature-card,
+  .aprova-yara-panel-card,
+  .aprova-flow-step,
+  .aprova-feature-icon {
+    transition: none !important;
+  }
+}
+
+/* —— Landing premium evoluída: mais informação, copy e vida —— */
+
+.aprova-landing-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 18% 22%, rgba(255, 255, 255, 0.9) 0 2px, transparent 3px),
+    radial-gradient(circle at 76% 18%, rgba(255, 255, 255, 0.8) 0 2px, transparent 3px),
+    radial-gradient(circle at 83% 65%, rgba(255, 255, 255, 0.8) 0 2px, transparent 3px),
+    radial-gradient(circle at 30% 78%, rgba(255, 255, 255, 0.7) 0 2px, transparent 3px);
+  opacity: 0.55;
+  animation: aprovaParticlesFloat 18s ease-in-out infinite alternate;
+}
+
+.aprova-reveal-1,
+.aprova-reveal-2,
+.aprova-reveal-3,
+.aprova-reveal-4,
+.aprova-reveal-5 {
+  opacity: 0;
+  transform: translateY(18px);
+  animation: aprovaRevealUp 700ms ease forwards;
+}
+
+.aprova-reveal-2 {
+  animation-delay: 120ms;
+}
+
+.aprova-reveal-3 {
+  animation-delay: 220ms;
+}
+
+.aprova-reveal-4 {
+  animation-delay: 320ms;
+}
+
+.aprova-reveal-5 {
+  animation-delay: 420ms;
+}
+
+.aprova-landing-mini-proof {
+  margin-top: 22px;
+  display: grid;
+  gap: 8px;
+  max-width: 680px;
+  padding: 18px 20px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.aprova-landing-mini-proof strong {
+  font-size: 17px;
+}
+
+.aprova-landing-mini-proof span {
+  color: #c7ccdc;
+  line-height: 1.65;
+}
+
+.aprova-orbit-ring {
+  position: absolute;
+  inset: 24%;
+  border-radius: 999px;
+  border: 1px dashed rgba(155, 123, 255, 0.22);
+  pointer-events: none;
+}
+
+.aprova-orbit-ring.ring-1 {
+  animation: aprovaOrbitRotate 18s linear infinite;
+}
+
+.aprova-orbit-ring.ring-2 {
+  inset: 32%;
+  animation: aprovaOrbitRotateReverse 24s linear infinite;
+}
+
+.aprova-problem-strip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.aprova-problem-strip-card {
+  border-radius: 24px;
+  padding: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background:
+    radial-gradient(circle at top right, rgba(122, 92, 255, 0.08), transparent 34%),
+    rgba(255, 255, 255, 0.04);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.18);
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.aprova-problem-strip-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(191, 168, 255, 0.2);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.24);
+}
+
+.aprova-problem-strip-card strong {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.aprova-problem-strip-card p {
+  margin: 0;
+  color: #c1c6d8;
+  line-height: 1.65;
+}
+
+.aprova-difference-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.aprova-difference-card {
+  border-radius: 26px;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.18);
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.aprova-difference-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(191, 168, 255, 0.22);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.24);
+}
+
+.aprova-difference-card > svg {
+  margin-bottom: 14px;
+  color: #d5c7ff;
+}
+
+.aprova-difference-card strong {
+  display: block;
+  margin: 0 0 10px;
+  font-size: 24px;
+  line-height: 1.15;
+}
+
+.aprova-difference-card p {
+  margin: 0;
+  color: #c1c6d8;
+  line-height: 1.65;
+}
+
+@keyframes aprovaRevealUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes aprovaParticlesFloat {
+  from {
+    transform: translateY(0) translateX(0);
+  }
+
+  to {
+    transform: translateY(-12px) translateX(8px);
+  }
+}
+
+@keyframes aprovaOrbitRotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes aprovaOrbitRotateReverse {
+  from {
+    transform: rotate(360deg);
+  }
+
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes aprovaCorePulse {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  50% {
+    transform: translate(-50%, -50%) scale(1.04);
+  }
+}
+
+@keyframes aprovaNodeFloat {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+
+  50% {
+    translate: 0 -6px;
+  }
+}
+
+.aprova-orbit-card::before {
+  animation: aprovaOrbitRotate 26s linear infinite;
+}
+
+.aprova-orbit-core {
+  animation: aprovaCorePulse 3.6s ease-in-out infinite;
+}
+
+.aprova-orbit-node {
+  animation: aprovaNodeFloat 4s ease-in-out infinite;
+}
+
+.node-right {
+  animation-delay: 0.5s;
+}
+
+.node-bottom {
+  animation-delay: 1s;
+}
+
+.node-left {
+  animation-delay: 1.5s;
+}
+
+@media (max-width: 1100px) {
+  .aprova-problem-strip,
+  .aprova-difference-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .aprova-landing-mini-proof,
+  .aprova-problem-strip-card,
+  .aprova-difference-card {
+    padding: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aprova-landing-particles,
+  .aprova-reveal-1,
+  .aprova-reveal-2,
+  .aprova-reveal-3,
+  .aprova-reveal-4,
+  .aprova-reveal-5,
+  .aprova-orbit-ring,
+  .aprova-orbit-card::before,
+  .aprova-orbit-core,
+  .aprova-orbit-node {
+    animation: none !important;
+    transform: none !important;
+    translate: 0 0 !important;
+    opacity: 1 !important;
+  }
+}
