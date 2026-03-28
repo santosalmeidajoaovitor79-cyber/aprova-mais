@@ -37,14 +37,14 @@ function AuthScreenComponent({
   const benefitItems =
     mode === "login"
       ? [
-          { icon: Clock3, title: "Retome sem atrito", text: "volte para o tópico exato" },
-          { icon: Brain, title: "Memória da Yara", text: "continua do seu contexto" },
-          { icon: ShieldCheck, title: "Seu histórico", text: "questões e chat preservados" },
+          { icon: Clock3, title: "Volta imediata ao foco", text: "retome do ponto exato em que parou" },
+          { icon: Brain, title: "Yara lembra de você", text: "contexto, ritmo e explicações continuam vivos" },
+          { icon: ShieldCheck, title: "Seu avanço fica guardado", text: "histórico, questões e trilha seguem com você" },
         ]
       : [
-          { icon: Sparkles, title: "Plano vivo", text: "a Yara ajusta ao seu ritmo" },
-          { icon: Brain, title: "Explicação do seu jeito", text: "mais teoria, exemplo ou prática" },
-          { icon: ShieldCheck, title: "Entrada leve", text: "sem formulário grande e frio" },
+          { icon: Sparkles, title: "Começo com direção", text: "você entra e a Yara já organiza a largada" },
+          { icon: Brain, title: "Estudo com encaixe real", text: "rotina, nível e estilo viram um plano vivo" },
+          { icon: ShieldCheck, title: "Cadastro sem peso morto", text: "menos burocracia, mais clareza para começar" },
         ];
 
   const statusTone =
@@ -119,13 +119,13 @@ function AuthScreenComponent({
           <p style={{ ...styles.landingBrand, marginTop: 18, marginBottom: 10 }}>Aprova+</p>
           <h1 style={{ ...styles.formTitle, fontSize: 28, lineHeight: 1.08, marginTop: 0 }}>
             {mode === "login"
-              ? "Volte para o ponto exato em que a Yara parou com você."
-              : "Comece com um plano que já nasce no seu ritmo."}
+              ? "Entre e volte a estudar com direção, ritmo e confiança."
+              : "Crie sua conta e comece com a Yara montando seu melhor início."}
           </h1>
           <p style={{ ...styles.formText, fontSize: 15, marginTop: 10, lineHeight: 1.7 }}>
             {mode === "login"
-              ? "Login rápido, histórico preservado e continuidade real nas explicações, questões e trilha até a prova."
-              : "Crie sua conta e deixe a Yara montar um começo inteligente: prova alvo, rotina, dificuldades e estilo de explicação em poucas etapas."}
+              ? "Seu plano, suas revisões e a leitura da Yara sobre o seu momento ficam prontos para continuar sem atrito."
+              : "Isso não é só cadastro. E a entrada em um plano mais inteligente, com a Yara entendendo sua prova, sua rotina e o jeito que você aprende."}
           </p>
 
           <div style={{ display: "grid", gap: 10, marginTop: 18 }}>
@@ -190,13 +190,13 @@ function AuthScreenComponent({
           </div>
 
           <h2 style={{ ...styles.formTitle, fontSize: 20, marginTop: 16 }}>
-            {mode === "login" ? "Acessar" : "Cadastro"}
+            {mode === "login" ? "Entrar no meu plano" : "Comecar meu plano"}
           </h2>
 
           <p style={{ ...styles.formText, fontSize: 13, marginTop: 8 }}>
             {mode === "login"
-              ? "Entre para retomar sua trilha e o contexto que a Yara já conhece."
-              : "Primeiro o acesso. Logo depois, a Yara conduz um onboarding curto e conversacional."}
+              ? "Volte para a sua trilha com a Yara retomando exatamente de onde faz mais sentido."
+              : "Voce cria o acesso agora e, em seguida, a Yara desenha com voce os primeiros passos."}
           </p>
 
           <div style={{ ...styles.formFields, marginTop: 16, gap: 14 }}>
@@ -254,11 +254,11 @@ function AuthScreenComponent({
                 }}
               >
                 <p style={{ margin: 0, fontSize: 13, fontWeight: 800, color: "#f5f3ff" }}>
-                  A Yara ajusta o resto com você
+                  A Yara monta o começo com você
                 </p>
                 <p style={{ margin: "6px 0 0 0", fontSize: 13, lineHeight: 1.6, color: "#d4d4d8" }}>
-                  Depois do cadastro, ela vai perguntar em etapas curtas sobre concurso, data da prova,
-                  horas por dia, dificuldades e o jeito de explicar que mais rende para você.
+                  Depois da conta criada, ela conduz uma conversa curta para entender seu alvo, seu tempo,
+                  seus travamentos e a melhor forma de te puxar para frente.
                 </p>
               </div>
             ) : null}
@@ -312,7 +312,7 @@ function AuthScreenComponent({
             }}
           >
             <Lock size={16} />
-            {saving ? "Abrindo…" : mode === "login" ? "Entrar no Aprova+" : "Criar conta e começar"}
+            {saving ? "Abrindo..." : mode === "login" ? "Entrar e retomar meu plano" : "Criar conta e montar meu inicio"}
             {!saving ? <ArrowRight size={16} /> : null}
           </button>
 

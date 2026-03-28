@@ -109,50 +109,50 @@ function OnboardingModalComponent({ open, user, contests, studyApi, onFinished }
     {
       id: "contest",
       icon: Target,
-      title: "Para qual prova ou concurso eu vou te puxar primeiro?",
-      helper: "Você pode escolher algo do catálogo ou criar um concurso personalizado.",
+      title: "Qual prova merece o nosso foco primeiro?",
+      helper: "Voce pode escolher algo do catalogo ou criar um concurso so seu, sem confusao no caminho.",
     },
     {
       id: "examDate",
       icon: CalendarDays,
-      title: "Se você já souber a data da prova, eu calibro sua urgência melhor.",
-      helper: "Se ainda não tiver certeza, tudo bem pular por enquanto.",
+      title: "Se ja existir uma data, eu ajusto seu ritmo com mais precisao.",
+      helper: "Se isso ainda estiver em aberto, sem problema. A gente pode seguir mesmo assim.",
     },
     {
       id: "hours",
       icon: Clock3,
-      title: "Quanto tempo por dia cabe de verdade na sua rotina?",
-      helper: "Prefiro um plano realista a uma meta bonita que não encaixa.",
+      title: "Quanto tempo cabe de verdade na sua rotina?",
+      helper: "Eu prefiro te entregar consistencia real, nao uma meta bonita que morre em dois dias.",
     },
     {
       id: "level",
       icon: GraduationCap,
-      title: "Em que ponto você sente que está hoje?",
-      helper: "Isso me ajuda a decidir se começo da base ou se acelero mais.",
+      title: "Hoje, voce se sente em que ponto da jornada?",
+      helper: "Com isso eu decido se te dou mais base, mais velocidade ou um meio-termo inteligente.",
     },
     {
       id: "difficulties",
       icon: ChartNoAxesColumn,
-      title: "Quais pontos mais costumam te travar?",
-      helper: "Pode citar matérias, temas ou padrões de erro. Se quiser, escreva em poucas palavras.",
+      title: "O que mais costuma te travar quando voce estuda?",
+      helper: "Vale falar de materia, tema, cansaco, leitura ou padrao de erro. Poucas palavras ja bastam.",
     },
     {
       id: "explanation",
       icon: Sparkles,
-      title: "Como você gosta que a Yara explique?",
-      helper: "Eu adapto o tom e a profundidade das explicações.",
+      title: "Qual jeito de explicar faz voce render mais?",
+      helper: "Eu ajusto a voz, a profundidade e o ritmo para a explicacao encaixar melhor em voce.",
     },
     {
       id: "move",
       icon: BookOpen,
-      title: "Quando surge uma dúvida, o que te ajuda mais primeiro?",
-      helper: "Isso ajusta a ordem entre teoria, exemplo, contraste e prática.",
+      title: "Quando bate duvida, o que costuma te destravar primeiro?",
+      helper: "Isso organiza a ordem entre teoria, exemplo, contraste e pratica dentro do seu plano.",
     },
     {
       id: "focus",
       icon: Brain,
-      title: "Perfeito. E qual deve ser o nosso foco logo no começo?",
-      helper: "Esse foco aparece no seu perfil e puxa o tom do plano inicial.",
+      title: "Pra comecar forte, onde voce quer sentir evolucao primeiro?",
+      helper: "Esse foco entra no seu perfil e guia o tom do seu plano inicial com a Yara.",
     },
   ];
 
@@ -289,6 +289,26 @@ function OnboardingModalComponent({ open, user, contests, studyApi, onFinished }
   const CurrentIcon = currentStep.icon;
   const canSkip = ["examDate", "difficulties", "explanation", "move", "focus"].includes(currentStep.id);
 
+  function switchToExistingContestMode() {
+    setContestMode("existing");
+    setPickedContestId("");
+    setCustomContestId("");
+    setCustomName("");
+    setCustomSubject("");
+    setCustomTopic("");
+    setLocalError("");
+  }
+
+  function switchToCustomContestMode() {
+    setContestMode("custom");
+    setPickedContestId("");
+    setCustomContestId("");
+    setCustomName("");
+    setCustomSubject("");
+    setCustomTopic("");
+    setLocalError("");
+  }
+
   return (
     <div style={overlay} role="dialog" aria-modal="true" aria-labelledby="onb-title">
       <div style={panel}>
@@ -320,13 +340,13 @@ function OnboardingModalComponent({ open, user, contests, studyApi, onFinished }
               }}
             >
               <Sparkles size={14} />
-              Yara está montando seu início
+              Yara esta desenhando seu comeco
             </div>
             <h2 id="onb-title" style={{ ...styles.sectionTitle, marginTop: 14, marginBottom: 0 }}>
-              Onboarding guiado, sem formulário frio
+              Vamos montar sua entrada do jeito certo
             </h2>
             <p style={{ ...styles.sectionText, marginTop: 8, marginBottom: 0, maxWidth: 560 }}>
-              Vou te conhecer em passos curtos e usar isso para calibrar concurso, ritmo e o jeito de explicar.
+              Me responde em poucos passos e eu transformo isso em direcao, ritmo e um plano que faca sentido para voce.
             </p>
           </div>
           <div
@@ -422,10 +442,7 @@ function OnboardingModalComponent({ open, user, contests, studyApi, onFinished }
                         }
                       : {}),
                   }}
-                  onClick={() => {
-                    setContestMode("existing");
-                    setCustomContestId("");
-                  }}
+                  onClick={switchToExistingContestMode}
                 >
                   Escolher do catálogo
                 </button>
@@ -442,12 +459,9 @@ function OnboardingModalComponent({ open, user, contests, studyApi, onFinished }
                         }
                       : {}),
                   }}
-                  onClick={() => {
-                    setContestMode("custom");
-                    setPickedContestId("");
-                  }}
+                  onClick={switchToCustomContestMode}
                 >
-                  Criar um concurso meu
+                  Criar concurso personalizado
                 </button>
               </div>
 
@@ -457,7 +471,7 @@ function OnboardingModalComponent({ open, user, contests, studyApi, onFinished }
                   onChange={(e) => setPickedContestId(e.target.value)}
                   style={styles.profileInput}
                 >
-                  <option value="">Selecione um concurso existente…</option>
+                  <option value="">Escolha uma prova do catalogo...</option>
                   {contests.map((contest) => (
                     <option key={contest.id} value={contest.id} style={styles.optionDark}>
                       {contest.name}
@@ -467,6 +481,9 @@ function OnboardingModalComponent({ open, user, contests, studyApi, onFinished }
                 </select>
               ) : (
                 <div style={{ display: "grid", gap: 10 }}>
+                  <p style={{ margin: 0, fontSize: 13, color: "#c4b5fd", lineHeight: 1.6 }}>
+                    Se sua prova nao estiver no catalogo, eu crio esse ponto de partida com voce agora.
+                  </p>
                   <input
                     placeholder="Nome da prova ou concurso"
                     value={customName}
@@ -721,7 +738,7 @@ function OnboardingModalComponent({ open, user, contests, studyApi, onFinished }
             disabled={busy}
             onClick={() => void handleNext()}
           >
-            {busy ? "Salvando…" : isLastStep ? "Concluir com a Yara" : "Continuar"}
+            {busy ? "Salvando..." : isLastStep ? "Fechar meu plano inicial" : "Continuar"}
             {!busy ? <ArrowRight size={16} /> : null}
           </button>
         </div>
@@ -738,8 +755,7 @@ function OnboardingModalComponent({ open, user, contests, studyApi, onFinished }
           <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
             <CircleCheckBig size={18} color="#86efac" style={{ marginTop: 1, flexShrink: 0 }} />
             <p style={{ margin: 0, fontSize: 13, color: "#d1fae5", lineHeight: 1.65 }}>
-              Você pode ajustar essas preferências depois. O objetivo aqui é só dar para a Yara um ponto de partida
-              melhor, sem travar sua entrada no app.
+              Voce pode ajustar tudo depois. Aqui eu so estou pegando o essencial para te entregar um comeco mais inteligente sem travar sua entrada.
             </p>
           </div>
         </div>
