@@ -66,17 +66,21 @@ function OnboardingModalComponent({ open, user, contests, studyApi, onFinished }
   const [busy, setBusy] = useState(false);
   const [localError, setLocalError] = useState("");
 
+  function clearContestSelectionState() {
+    setPickedContestId("");
+    setCustomContestId("");
+    setCustomName("");
+    setCustomSubject("");
+    setCustomTopic("");
+  }
+
   useEffect(() => {
     if (!open) return;
     setStep(0);
     setContestMode("existing");
     setExamDate("");
     setHours("2");
-    setPickedContestId("");
-    setCustomContestId("");
-    setCustomName("");
-    setCustomSubject("");
-    setCustomTopic("");
+    clearContestSelectionState();
     setCurrentLevel("");
     setDifficultiesText("");
     setExplanationPreference("");
@@ -110,48 +114,48 @@ function OnboardingModalComponent({ open, user, contests, studyApi, onFinished }
       id: "contest",
       icon: Target,
       title: "Qual prova merece o nosso foco primeiro?",
-      helper: "Voce pode escolher algo do catalogo ou criar um concurso so seu, sem confusao no caminho.",
+      helper: "Escolha do catálogo ou crie um concurso personalizado. Eu limpo o caminho para a gente começar sem bagunça.",
     },
     {
       id: "examDate",
       icon: CalendarDays,
-      title: "Se ja existir uma data, eu ajusto seu ritmo com mais precisao.",
-      helper: "Se isso ainda estiver em aberto, sem problema. A gente pode seguir mesmo assim.",
+      title: "Se já existir uma data, eu ajusto seu ritmo com mais precisão.",
+      helper: "Se isso ainda estiver em aberto, sem problema. Eu consigo montar seu começo mesmo assim.",
     },
     {
       id: "hours",
       icon: Clock3,
       title: "Quanto tempo cabe de verdade na sua rotina?",
-      helper: "Eu prefiro te entregar consistencia real, nao uma meta bonita que morre em dois dias.",
+      helper: "Prefiro te entregar consistência real, não uma meta bonita que morre em dois dias.",
     },
     {
       id: "level",
       icon: GraduationCap,
-      title: "Hoje, voce se sente em que ponto da jornada?",
-      helper: "Com isso eu decido se te dou mais base, mais velocidade ou um meio-termo inteligente.",
+      title: "Hoje, em que ponto da jornada você se sente?",
+      helper: "Com isso eu calibro profundidade, ritmo e o quanto te puxo em cada etapa.",
     },
     {
       id: "difficulties",
       icon: ChartNoAxesColumn,
-      title: "O que mais costuma te travar quando voce estuda?",
-      helper: "Vale falar de materia, tema, cansaco, leitura ou padrao de erro. Poucas palavras ja bastam.",
+      title: "O que mais costuma te travar quando você estuda?",
+      helper: "Pode ser matéria, tema, cansaço, leitura ou padrão de erro. Poucas palavras já bastam.",
     },
     {
       id: "explanation",
       icon: Sparkles,
-      title: "Qual jeito de explicar faz voce render mais?",
-      helper: "Eu ajusto a voz, a profundidade e o ritmo para a explicacao encaixar melhor em voce.",
+      title: "Qual jeito de explicar faz você render mais?",
+      helper: "Eu ajusto a voz, a profundidade e o ritmo para a explicação encaixar melhor em você.",
     },
     {
       id: "move",
       icon: BookOpen,
-      title: "Quando bate duvida, o que costuma te destravar primeiro?",
-      helper: "Isso organiza a ordem entre teoria, exemplo, contraste e pratica dentro do seu plano.",
+      title: "Quando bate dúvida, o que costuma te destravar primeiro?",
+      helper: "Isso organiza a ordem entre teoria, exemplo, contraste e prática dentro do seu plano.",
     },
     {
       id: "focus",
       icon: Brain,
-      title: "Pra comecar forte, onde voce quer sentir evolucao primeiro?",
+      title: "Para começar forte, onde você quer sentir evolução primeiro?",
       helper: "Esse foco entra no seu perfil e guia o tom do seu plano inicial com a Yara.",
     },
   ];
@@ -275,7 +279,7 @@ function OnboardingModalComponent({ open, user, contests, studyApi, onFinished }
 
   const panel = {
     width: "100%",
-    maxWidth: 760,
+    maxWidth: 1180,
     borderRadius: 28,
     border: "1px solid rgba(255,255,255,0.12)",
     background:
@@ -288,477 +292,374 @@ function OnboardingModalComponent({ open, user, contests, studyApi, onFinished }
 
   const CurrentIcon = currentStep.icon;
   const canSkip = ["examDate", "difficulties", "explanation", "move", "focus"].includes(currentStep.id);
+  const progressPct = ((step + 1) / steps.length) * 100;
 
   function switchToExistingContestMode() {
     setContestMode("existing");
-    setPickedContestId("");
-    setCustomContestId("");
-    setCustomName("");
-    setCustomSubject("");
-    setCustomTopic("");
+    clearContestSelectionState();
     setLocalError("");
   }
 
   function switchToCustomContestMode() {
     setContestMode("custom");
-    setPickedContestId("");
-    setCustomContestId("");
-    setCustomName("");
-    setCustomSubject("");
-    setCustomTopic("");
+    clearContestSelectionState();
     setLocalError("");
   }
 
   return (
-    <div style={overlay} role="dialog" aria-modal="true" aria-labelledby="onb-title">
-      <div style={panel}>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "space-between",
-            gap: 14,
-            alignItems: "center",
-            marginBottom: 18,
-          }}
-        >
-          <div>
-            <div
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 8,
-                padding: "8px 12px",
-                borderRadius: 999,
-                border: "1px solid rgba(196,181,253,0.18)",
-                background: "rgba(139,92,246,0.12)",
-                color: "#ede9fe",
-                fontSize: 12,
-                fontWeight: 800,
-                textTransform: "uppercase",
-                letterSpacing: "0.06em",
-              }}
-            >
-              <Sparkles size={14} />
-              Yara esta desenhando seu comeco
-            </div>
-            <h2 id="onb-title" style={{ ...styles.sectionTitle, marginTop: 14, marginBottom: 0 }}>
-              Vamos montar sua entrada do jeito certo
-            </h2>
-            <p style={{ ...styles.sectionText, marginTop: 8, marginBottom: 0, maxWidth: 560 }}>
-              Me responde em poucos passos e eu transformo isso em direcao, ritmo e um plano que faca sentido para voce.
-            </p>
+    <div className="aprova-onboarding-overlay" style={overlay} role="dialog" aria-modal="true" aria-labelledby="onb-title">
+      <div className="aprova-onboarding-shell" style={panel}>
+        <aside className="aprova-onboarding-side">
+          <div className="aprova-onboarding-badge">
+            <Sparkles size={14} />
+            Yara está desenhando seu começo
           </div>
-          <div
-            style={{
-              padding: "10px 14px",
-              borderRadius: 16,
-              border: "1px solid rgba(255,255,255,0.08)",
-              background: "rgba(255,255,255,0.04)",
-              minWidth: 132,
-              textAlign: "center",
-            }}
-          >
-            <p style={{ margin: 0, fontSize: 11, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-              Etapa
-            </p>
-            <p style={{ margin: "4px 0 0 0", fontSize: 18, fontWeight: 800, color: "#fafafa" }}>
-              {step + 1} / {steps.length}
-            </p>
-          </div>
-        </div>
 
-        {answerPreview.length ? (
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 18 }}>
-            {answerPreview.map((item) => (
-              <div
-                key={item.label}
-                style={{
-                  padding: "8px 12px",
-                  borderRadius: 999,
-                  border: "1px solid rgba(255,255,255,0.09)",
-                  background: "rgba(255,255,255,0.05)",
-                  maxWidth: "100%",
-                }}
-              >
-                <span style={{ fontSize: 12, color: "#a78bfa", fontWeight: 800 }}>{item.label}: </span>
-                <span style={{ fontSize: 12, color: "#e4e4e7" }}>{item.value}</span>
+          <div className="aprova-onboarding-hero">
+            <h2 id="onb-title">Eu vou montar seu começo com você.</h2>
+            <p>
+              Me responde em passos rápidos e eu transformo isso em um plano claro, no seu ritmo e
+              com foco no que realmente vai cair.
+            </p>
+          </div>
+
+          <div className="aprova-onboarding-progress-card">
+            <div className="aprova-onboarding-progress-head">
+              <div>
+                <span className="aprova-onboarding-progress-label">Etapa atual</span>
+                <strong>
+                  {step + 1} de {steps.length}
+                </strong>
               </div>
-            ))}
-          </div>
-        ) : null}
-
-        <div
-          style={{
-            display: "grid",
-            gap: 16,
-            padding: "18px 18px 20px",
-            borderRadius: 22,
-            border: "1px solid rgba(255,255,255,0.08)",
-            background: "rgba(255,255,255,0.04)",
-          }}
-        >
-          <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-            <div
-              style={{
-                width: 42,
-                height: 42,
-                borderRadius: 14,
-                display: "grid",
-                placeItems: "center",
-                background: "rgba(139,92,246,0.16)",
-                color: "#e9d5ff",
-                flexShrink: 0,
-              }}
-            >
-              <CurrentIcon size={18} />
+              <span className="aprova-onboarding-progress-value">{Math.round(progressPct)}%</span>
             </div>
-            <div>
-              <p style={{ margin: 0, fontSize: 12, color: "#a78bfa", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase" }}>
-                Yara
-              </p>
-              <p style={{ margin: "6px 0 0 0", fontSize: 18, fontWeight: 800, color: "#fafafa", lineHeight: 1.4 }}>
-                {currentStep.title}
-              </p>
-              <p style={{ margin: "8px 0 0 0", fontSize: 14, color: "#b4b4bf", lineHeight: 1.7 }}>
-                {currentStep.helper}
-              </p>
+            <div className="aprova-onboarding-progress-track">
+              <span className="aprova-onboarding-progress-fill" style={{ width: `${progressPct}%` }} />
+            </div>
+            <div className="aprova-onboarding-step-list">
+              {steps.map((item, index) => {
+                const active = index === step;
+                const done = index < step;
+                return (
+                  <div
+                    key={item.id}
+                    className={`aprova-onboarding-step-item ${active ? "is-active" : ""} ${done ? "is-done" : ""}`}
+                  >
+                    <span className="aprova-onboarding-step-bullet">
+                      {done ? <CircleCheckBig size={13} /> : index + 1}
+                    </span>
+                    <span>{item.title}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
-          {currentStep.id === "contest" ? (
-            <div style={{ display: "grid", gap: 12 }}>
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                <button
-                  type="button"
-                  style={{
-                    ...styles.cancelButton,
-                    borderRadius: 999,
-                    ...(contestMode === "existing"
-                      ? {
-                          border: "1px solid rgba(168,85,247,0.5)",
-                          background: "rgba(168,85,247,0.14)",
-                          color: "#faf5ff",
-                        }
-                      : {}),
-                  }}
-                  onClick={switchToExistingContestMode}
-                >
-                  Escolher do catálogo
-                </button>
-                <button
-                  type="button"
-                  style={{
-                    ...styles.cancelButton,
-                    borderRadius: 999,
-                    ...(contestMode === "custom"
-                      ? {
-                          border: "1px solid rgba(168,85,247,0.5)",
-                          background: "rgba(168,85,247,0.14)",
-                          color: "#faf5ff",
-                        }
-                      : {}),
-                  }}
-                  onClick={switchToCustomContestMode}
-                >
-                  Criar concurso personalizado
-                </button>
+          <div className="aprova-onboarding-side-note">
+            <strong>Seu plano já começa com contexto.</strong>
+            <p>
+              O que você responder aqui vira direção prática para a Yara puxar seu estudo do jeito
+              certo desde o início.
+            </p>
+          </div>
+
+          {answerPreview.length ? (
+            <div className="aprova-onboarding-preview-card">
+              <span className="aprova-onboarding-preview-title">O que a Yara já entendeu</span>
+              <div className="aprova-onboarding-preview-chips">
+                {answerPreview.map((item) => (
+                  <div key={item.label} className="aprova-onboarding-preview-chip">
+                    <span>{item.label}</span>
+                    <strong>{item.value}</strong>
+                  </div>
+                ))}
               </div>
+            </div>
+          ) : null}
+        </aside>
 
-              {contestMode === "existing" ? (
-                <select
-                  value={pickedContestId}
-                  onChange={(e) => setPickedContestId(e.target.value)}
-                  style={styles.profileInput}
-                >
-                  <option value="">Escolha uma prova do catalogo...</option>
-                  {contests.map((contest) => (
-                    <option key={contest.id} value={contest.id} style={styles.optionDark}>
-                      {contest.name}
-                      {contest.owner_user_id ? " (seu)" : ""}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <div style={{ display: "grid", gap: 10 }}>
-                  <p style={{ margin: 0, fontSize: 13, color: "#c4b5fd", lineHeight: 1.6 }}>
-                    Se sua prova nao estiver no catalogo, eu crio esse ponto de partida com voce agora.
-                  </p>
-                  <input
-                    placeholder="Nome da prova ou concurso"
-                    value={customName}
-                    onChange={(e) => {
-                      setCustomContestId("");
-                      setCustomName(e.target.value);
-                    }}
-                    style={styles.profileInput}
-                  />
-                  <input
-                    placeholder="Primeira matéria (opcional)"
-                    value={customSubject}
-                    onChange={(e) => {
-                      setCustomContestId("");
-                      setCustomSubject(e.target.value);
-                    }}
-                    style={styles.profileInput}
-                  />
-                  <input
-                    placeholder="Primeiro tópico (opcional)"
-                    value={customTopic}
-                    onChange={(e) => {
-                      setCustomContestId("");
-                      setCustomTopic(e.target.value);
-                    }}
-                    style={styles.profileInput}
-                  />
+        <section className="aprova-onboarding-main">
+          <div className="aprova-onboarding-question-card">
+            <div className="aprova-onboarding-question-head">
+              <div className="aprova-onboarding-question-icon">
+                <CurrentIcon size={18} />
+              </div>
+              <div>
+                <span className="aprova-onboarding-question-eyebrow">Pergunta da Yara</span>
+                <h3>{currentStep.title}</h3>
+                <p>{currentStep.helper}</p>
+              </div>
+            </div>
+
+            {currentStep.id === "contest" ? (
+              <div className="aprova-onboarding-stack">
+                <div className="aprova-onboarding-segment">
+                  <button
+                    type="button"
+                    className={`aprova-onboarding-segment-btn ${contestMode === "existing" ? "active" : ""}`}
+                    onClick={switchToExistingContestMode}
+                  >
+                    Escolher do catálogo
+                  </button>
+                  <button
+                    type="button"
+                    className={`aprova-onboarding-segment-btn ${contestMode === "custom" ? "active" : ""}`}
+                    onClick={switchToCustomContestMode}
+                  >
+                    Criar concurso personalizado
+                  </button>
                 </div>
-              )}
+
+                {contestMode === "existing" ? (
+                  <label className="aprova-onboarding-input-wrap">
+                    <span>Escolha sua prova</span>
+                    <select
+                      value={pickedContestId}
+                      onChange={(e) => setPickedContestId(e.target.value)}
+                      style={styles.profileInput}
+                      className="aprova-onboarding-input"
+                    >
+                      <option value="">Escolha uma prova do catálogo...</option>
+                      {contests.map((contest) => (
+                        <option key={contest.id} value={contest.id} style={styles.optionDark}>
+                          {contest.name}
+                          {contest.owner_user_id ? " (seu)" : ""}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                ) : (
+                  <div className="aprova-onboarding-stack">
+                    <div className="aprova-onboarding-mini-callout">
+                      Se sua prova não estiver no catálogo, eu crio esse ponto de partida com você
+                      agora.
+                    </div>
+                    <label className="aprova-onboarding-input-wrap">
+                      <span>Nome da prova ou concurso</span>
+                      <input
+                        placeholder="Ex.: TJ-SP, INSS ou concurso da sua cidade"
+                        value={customName}
+                        onChange={(e) => {
+                          setCustomContestId("");
+                          setCustomName(e.target.value);
+                        }}
+                        style={styles.profileInput}
+                        className="aprova-onboarding-input"
+                      />
+                    </label>
+                    <label className="aprova-onboarding-input-wrap">
+                      <span>Primeira matéria (opcional)</span>
+                      <input
+                        placeholder="Ex.: Constitucional"
+                        value={customSubject}
+                        onChange={(e) => {
+                          setCustomContestId("");
+                          setCustomSubject(e.target.value);
+                        }}
+                        style={styles.profileInput}
+                        className="aprova-onboarding-input"
+                      />
+                    </label>
+                    <label className="aprova-onboarding-input-wrap">
+                      <span>Primeiro tópico (opcional)</span>
+                      <input
+                        placeholder="Ex.: Controle de constitucionalidade"
+                        value={customTopic}
+                        onChange={(e) => {
+                          setCustomContestId("");
+                          setCustomTopic(e.target.value);
+                        }}
+                        style={styles.profileInput}
+                        className="aprova-onboarding-input"
+                      />
+                    </label>
+                  </div>
+                )}
+              </div>
+            ) : null}
+
+            {currentStep.id === "examDate" ? (
+              <label className="aprova-onboarding-input-wrap">
+                <span>Se já souber, me passa a data</span>
+                <input
+                  type="date"
+                  value={examDate}
+                  onChange={(e) => setExamDate(e.target.value)}
+                  style={styles.profileInput}
+                  className="aprova-onboarding-input"
+                />
+              </label>
+            ) : null}
+
+            {currentStep.id === "hours" ? (
+              <div className="aprova-onboarding-choice-grid aprova-onboarding-choice-grid--compact">
+                {["1h", "2h", "3h", "4h+"].map((label) => {
+                  const value = label.replace("h", "");
+                  const active = hours === value;
+                  return (
+                    <button
+                      key={label}
+                      type="button"
+                      onClick={() => setHours(value)}
+                      className={`aprova-onboarding-choice-card ${active ? "active" : ""}`}
+                    >
+                      <strong>{label}</strong>
+                      <span>{label === "1h" ? "ritmo leve" : label === "2h" ? "base consistente" : label === "3h" ? "ritmo forte" : "imersão total"}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
+
+            {currentStep.id === "level" ? (
+              <div className="aprova-onboarding-choice-grid">
+                {levelOptions.map((option) => {
+                  const active = currentLevel === option.value;
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setCurrentLevel(option.value)}
+                      className={`aprova-onboarding-choice-card aprova-onboarding-choice-card--left ${active ? "active" : ""}`}
+                    >
+                      <strong>{option.label}</strong>
+                      <span>{option.helper}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
+
+            {currentStep.id === "difficulties" ? (
+              <label className="aprova-onboarding-input-wrap">
+                <span>Escreva do jeito mais natural possível</span>
+                <textarea
+                  value={difficultiesText}
+                  onChange={(e) => setDifficultiesText(e.target.value)}
+                  placeholder="Ex.: interpretação de texto, constitucional, leitura rápida de enunciado"
+                  style={{
+                    ...styles.profileInput,
+                    minHeight: 120,
+                    resize: "vertical",
+                    fontFamily: styles.page.fontFamily,
+                  }}
+                  className="aprova-onboarding-input aprova-onboarding-textarea"
+                />
+              </label>
+            ) : null}
+
+            {currentStep.id === "explanation" ? (
+              <div className="aprova-onboarding-choice-grid">
+                {explanationOptions.map((option) => {
+                  const active = explanationPreference === option.value;
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setExplanationPreference(option.value)}
+                      className={`aprova-onboarding-choice-card aprova-onboarding-choice-card--left ${active ? "active" : ""}`}
+                    >
+                      <strong>{option.label}</strong>
+                      <span>{option.helper}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
+
+            {currentStep.id === "move" ? (
+              <div className="aprova-onboarding-choice-grid">
+                {moveOptions.map((option) => {
+                  const active = preferredStudyMove === option.value;
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setPreferredStudyMove(option.value)}
+                      className={`aprova-onboarding-choice-card aprova-onboarding-choice-card--left ${active ? "active" : ""}`}
+                    >
+                      <strong>{option.label}</strong>
+                      <span>{option.helper}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
+
+            {currentStep.id === "focus" ? (
+              <div className="aprova-onboarding-choice-grid">
+                {focusOptions.map((option) => {
+                  const active = initialFocus === option.value;
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setInitialFocus(option.value)}
+                      className={`aprova-onboarding-choice-card aprova-onboarding-choice-card--left ${active ? "active" : ""}`}
+                    >
+                      <strong>{option.value}</strong>
+                      <span>{option.helper}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
+          </div>
+
+          {localError ? <p style={{ ...styles.errorText, margin: "14px 0 0 0" }}>{localError}</p> : null}
+
+          <div className="aprova-onboarding-actions">
+            <div className="aprova-onboarding-actions-left">
+              {step > 0 ? (
+                <button
+                  type="button"
+                  style={styles.cancelButton}
+                  className="aprova-onboarding-secondary-button"
+                  disabled={busy}
+                  onClick={() => setStep((value) => value - 1)}
+                >
+                  Voltar
+                </button>
+              ) : null}
+              {canSkip ? (
+                <button
+                  type="button"
+                  style={styles.cancelButton}
+                  className="aprova-onboarding-secondary-button"
+                  disabled={busy}
+                  onClick={() => {
+                    setLocalError("");
+                    if (!isLastStep) {
+                      setStep((value) => value + 1);
+                    } else {
+                      void handleFinish();
+                    }
+                  }}
+                >
+                  Pular por enquanto
+                </button>
+              ) : null}
             </div>
-          ) : null}
 
-          {currentStep.id === "examDate" ? (
-            <input
-              type="date"
-              value={examDate}
-              onChange={(e) => setExamDate(e.target.value)}
-              style={styles.profileInput}
-            />
-          ) : null}
-
-          {currentStep.id === "hours" ? (
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-              {["1h", "2h", "3h", "4h+"].map((label) => {
-                const value = label.replace("h", "");
-                const active = hours === value;
-                return (
-                  <button
-                    key={label}
-                    type="button"
-                    onClick={() => setHours(value)}
-                    style={{
-                      minWidth: 96,
-                      padding: "14px 16px",
-                      borderRadius: 16,
-                      border: active
-                        ? "1px solid rgba(168,85,247,0.5)"
-                        : "1px solid rgba(255,255,255,0.1)",
-                      background: active ? "rgba(168,85,247,0.14)" : "rgba(255,255,255,0.04)",
-                      color: active ? "#faf5ff" : "#e4e4e7",
-                      fontWeight: 800,
-                      cursor: "pointer",
-                    }}
-                  >
-                    {label}
-                  </button>
-                );
-              })}
-            </div>
-          ) : null}
-
-          {currentStep.id === "level" ? (
-            <div style={{ display: "grid", gap: 10 }}>
-              {levelOptions.map((option) => {
-                const active = currentLevel === option.value;
-                return (
-                  <button
-                    key={option.value}
-                    type="button"
-                    onClick={() => setCurrentLevel(option.value)}
-                    style={{
-                      textAlign: "left",
-                      padding: "15px 16px",
-                      borderRadius: 18,
-                      border: active
-                        ? "1px solid rgba(168,85,247,0.5)"
-                        : "1px solid rgba(255,255,255,0.1)",
-                      background: active ? "rgba(168,85,247,0.14)" : "rgba(255,255,255,0.04)",
-                      color: "#f4f4f5",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <p style={{ margin: 0, fontSize: 15, fontWeight: 800 }}>{option.label}</p>
-                    <p style={{ margin: "6px 0 0 0", fontSize: 13, color: "#b4b4bf", lineHeight: 1.5 }}>
-                      {option.helper}
-                    </p>
-                  </button>
-                );
-              })}
-            </div>
-          ) : null}
-
-          {currentStep.id === "difficulties" ? (
-            <textarea
-              value={difficultiesText}
-              onChange={(e) => setDifficultiesText(e.target.value)}
-              placeholder="Ex.: interpretação de texto, constitucional, leitura rápida de enunciado"
-              style={{
-                ...styles.profileInput,
-                minHeight: 110,
-                resize: "vertical",
-                fontFamily: styles.page.fontFamily,
-              }}
-            />
-          ) : null}
-
-          {currentStep.id === "explanation" ? (
-            <div style={{ display: "grid", gap: 10 }}>
-              {explanationOptions.map((option) => {
-                const active = explanationPreference === option.value;
-                return (
-                  <button
-                    key={option.value}
-                    type="button"
-                    onClick={() => setExplanationPreference(option.value)}
-                    style={{
-                      textAlign: "left",
-                      padding: "14px 16px",
-                      borderRadius: 18,
-                      border: active
-                        ? "1px solid rgba(168,85,247,0.5)"
-                        : "1px solid rgba(255,255,255,0.1)",
-                      background: active ? "rgba(168,85,247,0.14)" : "rgba(255,255,255,0.04)",
-                      color: "#f4f4f5",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <p style={{ margin: 0, fontSize: 15, fontWeight: 800 }}>{option.label}</p>
-                    <p style={{ margin: "6px 0 0 0", fontSize: 13, color: "#b4b4bf", lineHeight: 1.5 }}>
-                      {option.helper}
-                    </p>
-                  </button>
-                );
-              })}
-            </div>
-          ) : null}
-
-          {currentStep.id === "move" ? (
-            <div style={{ display: "grid", gap: 10 }}>
-              {moveOptions.map((option) => {
-                const active = preferredStudyMove === option.value;
-                return (
-                  <button
-                    key={option.value}
-                    type="button"
-                    onClick={() => setPreferredStudyMove(option.value)}
-                    style={{
-                      textAlign: "left",
-                      padding: "14px 16px",
-                      borderRadius: 18,
-                      border: active
-                        ? "1px solid rgba(168,85,247,0.5)"
-                        : "1px solid rgba(255,255,255,0.1)",
-                      background: active ? "rgba(168,85,247,0.14)" : "rgba(255,255,255,0.04)",
-                      color: "#f4f4f5",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <p style={{ margin: 0, fontSize: 15, fontWeight: 800 }}>{option.label}</p>
-                    <p style={{ margin: "6px 0 0 0", fontSize: 13, color: "#b4b4bf", lineHeight: 1.5 }}>
-                      {option.helper}
-                    </p>
-                  </button>
-                );
-              })}
-            </div>
-          ) : null}
-
-          {currentStep.id === "focus" ? (
-            <div style={{ display: "grid", gap: 10 }}>
-              {focusOptions.map((option) => {
-                const active = initialFocus === option.value;
-                return (
-                  <button
-                    key={option.value}
-                    type="button"
-                    onClick={() => setInitialFocus(option.value)}
-                    style={{
-                      textAlign: "left",
-                      padding: "14px 16px",
-                      borderRadius: 18,
-                      border: active
-                        ? "1px solid rgba(168,85,247,0.5)"
-                        : "1px solid rgba(255,255,255,0.1)",
-                      background: active ? "rgba(168,85,247,0.14)" : "rgba(255,255,255,0.04)",
-                      color: "#f4f4f5",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <p style={{ margin: 0, fontSize: 15, fontWeight: 800 }}>{option.value}</p>
-                    <p style={{ margin: "6px 0 0 0", fontSize: 13, color: "#b4b4bf", lineHeight: 1.5 }}>
-                      {option.helper}
-                    </p>
-                  </button>
-                );
-              })}
-            </div>
-          ) : null}
-        </div>
-
-        {localError ? <p style={{ ...styles.errorText, marginBottom: 12 }}>{localError}</p> : null}
-
-        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 18 }}>
-          {step > 0 ? (
             <button
               type="button"
-              style={styles.cancelButton}
+              className="aprova-onboarding-primary-button"
               disabled={busy}
-              onClick={() => setStep((value) => value - 1)}
+              onClick={() => void handleNext()}
             >
-              Voltar
+              {busy ? "Salvando..." : isLastStep ? "Fechar meu plano inicial" : "Continuar"}
+              {!busy ? <ArrowRight size={16} /> : null}
             </button>
-          ) : null}
-          {canSkip ? (
-            <button
-              type="button"
-              style={styles.cancelButton}
-              disabled={busy}
-              onClick={() => {
-                setLocalError("");
-                if (!isLastStep) {
-                  setStep((value) => value + 1);
-                } else {
-                  void handleFinish();
-                }
-              }}
-            >
-              Pular por enquanto
-            </button>
-          ) : null}
-          <button
-            type="button"
-            style={{
-              ...styles.primaryOnlyButton,
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-              background: "linear-gradient(135deg, #f5f3ff 0%, #e9d5ff 45%, #ddd6fe 100%)",
-              boxShadow: "0 12px 36px rgba(139,92,246,0.22)",
-            }}
-            disabled={busy}
-            onClick={() => void handleNext()}
-          >
-            {busy ? "Salvando..." : isLastStep ? "Fechar meu plano inicial" : "Continuar"}
-            {!busy ? <ArrowRight size={16} /> : null}
-          </button>
-        </div>
+          </div>
 
-        <div
-          style={{
-            marginTop: 16,
-            padding: "14px 16px",
-            borderRadius: 18,
-            border: "1px solid rgba(74,222,128,0.16)",
-            background: "rgba(22,163,74,0.08)",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+          <div className="aprova-onboarding-footnote">
             <CircleCheckBig size={18} color="#86efac" style={{ marginTop: 1, flexShrink: 0 }} />
-            <p style={{ margin: 0, fontSize: 13, color: "#d1fae5", lineHeight: 1.65 }}>
-              Voce pode ajustar tudo depois. Aqui eu so estou pegando o essencial para te entregar um comeco mais inteligente sem travar sua entrada.
+            <p>
+              Você pode ajustar tudo depois. Aqui eu só estou pegando o essencial para te entregar
+              um começo mais inteligente sem travar sua entrada.
             </p>
           </div>
-        </div>
+        </section>
       </div>
     </div>
   );
