@@ -56,12 +56,17 @@ async function invokeBillingFunction(supabase, functionName, body) {
   return result;
 }
 
-export async function fetchOwnSubscription(supabase) {
+export async function fetchOwnSubscription(supabase, userId) {
+  if (!userId) {
+    return { data: null, error: new Error("AUTH_REQUIRED") };
+  }
+
   return supabase
     .from("subscriptions")
     .select(
       "id, user_id, stripe_customer_id, stripe_subscription_id, stripe_price_id, plan_key, billing_cycle, status, current_period_end, cancel_at_period_end, created_at, updated_at"
     )
+    .eq("user_id", userId)
     .maybeSingle();
 }
 

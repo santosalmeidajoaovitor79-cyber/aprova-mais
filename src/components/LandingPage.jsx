@@ -63,7 +63,7 @@ const differenceCards = [
   },
 ];
 
-function LandingPageComponent({ onStartRegister, onStartLogin, warpActive = false }) {
+function LandingPageComponent({ onStartRegister, onStartLogin, onSelectPricingPlan, warpActive = false }) {
   return (
     <div className={`aprova-landing-shell aprova-landing-page${warpActive ? " aprova-landing-warp-out" : ""}`}>
       <div className="aprova-landing-bg" />
@@ -256,7 +256,7 @@ function LandingPageComponent({ onStartRegister, onStartLogin, warpActive = fals
         </div>
       </section>
 
-      <PricingSection onRequireAuth={() => onStartRegister?.()} onLogin={onStartLogin} />
+      <PricingSection onRequireAuth={onSelectPricingPlan} onLogin={onStartLogin} />
 
       <section className="aprova-landing-final">
         <span className="aprova-landing-final-kicker">Se você quer parar de estudar no escuro...</span>

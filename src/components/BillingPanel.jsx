@@ -1,4 +1,4 @@
-import { memo, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { CheckCircle2, Crown, CreditCard, Sparkles } from "lucide-react";
 import { BILLING_PLANS, getBillingPrice } from "../lib/billing.js";
 
@@ -18,6 +18,12 @@ function BillingPanelComponent({
   const renewalLabel = subscription?.renewalLabel || "Sem data de renovação disponível ainda.";
 
   const plans = useMemo(() => Object.values(BILLING_PLANS), []);
+
+  useEffect(() => {
+    if (access?.billingCycle === "monthly" || access?.billingCycle === "yearly") {
+      setBillingCycle(access.billingCycle);
+    }
+  }, [access?.billingCycle]);
 
   return (
     <section className="aprova-panel-soft is-large aprova-billing-panel">

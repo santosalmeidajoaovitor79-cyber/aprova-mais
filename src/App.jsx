@@ -22,6 +22,7 @@ import { useStudyArea } from "./hooks/useStudyArea.js";
 import { useUsageQuota } from "./hooks/useUsageQuota.js";
 import { AdminContestsPage } from "./pages/AdminContestsPage.jsx";
 import * as activityApi from "./api/studyActivityApi.js";
+import * as adminApi from "./api/adminCatalogApi.js";
 import { supabase } from "./lib/supabaseClient.js";
 import { styles } from "./styles/appStyles.js";
 import { computeDaysUntilExam, examCountdownLabel } from "./utils/examDate.js";
@@ -75,6 +76,8 @@ function App() {
   const [transitionActive, setTransitionActive] = useState(false);
   const [pendingAuthMode, setPendingAuthMode] = useState(null);
   const [authVisible, setAuthVisible] = useState(false);
+  const [pendingBillingSelection, setPendingBillingSelection] = useState(null);
+  const [isAdminUser, setIsAdminUser] = useState(false);
   const [pathname, setPathname] = useState(() => window.location.pathname || "/");
   const transitionLockRef = useRef(false);
   const transitionTimersRef = useRef([]);
@@ -94,8 +97,18 @@ function App() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (params.get("tab") === "profile") {
+    const targetTab = params.get("tab");
+    const billingState = params.get("billing");
+    if (targetTab === "profile") {
       setMainTab("profile");
+    }
+    if (billingState === "success") {
+      setMessage("Checkout concluído. Assim que a Stripe confirmar, sua assinatura aparece no perfil.");
+    }
+    if (billingState === "cancel") {
+      setMessage("Checkout cancelado. Quando quiser, você pode tentar de novo.");
+    }
+    if (targetTab || billingState) {
       window.history.replaceState({}, "", window.location.pathname || "/");
     }
   }, []);
@@ -123,13 +136,20 @@ function App() {
   }, [mainTab]);
 
   const startAuthTransition = useCallback(
-    (nextMode) => {
+    (nextMode, options = {}) => {
       if (transitionLockRef.current) return;
+      const nextBillingSelection =
+        options?.billingSelection &&
+        typeof options.billingSelection.planKey === "string" &&
+        typeof options.billingSelection.billingCycle === "string"
+          ? options.billingSelection
+          : null;
       transitionLockRef.current = true;
       clearAuthTransitionTimers();
       setError("");
       setMessage("");
       setAuthFeedback(null);
+      setPendingBillingSelection(nextBillingSelection);
       setMode(nextMode);
       setPendingAuthMode(nextMode);
       setTransitionActive(true);
@@ -153,6 +173,7 @@ function App() {
     setTransitionActive(false);
     setPendingAuthMode(null);
     setAuthVisible(false);
+    setPendingBillingSelection(null);
     setError("");
     setMessage("");
     setAuthFeedback(null);
@@ -510,6 +531,9 @@ function App() {
       setAuthVisible(false);
       setTransitionActive(false);
       setPendingAuthMode(null);
+      setPendingBillingSelection(null);
+      setIsAdminUser(false);
+      profileRef.current.resetProfile();
       setPreAuthPhase("landing");
     }
   }, [session, loading, clearAuthTransitionTimers]);
@@ -530,6 +554,51 @@ function App() {
       cancelled = true;
     };
   }, [session?.user?.id]);
+
+  useEffect(() => {
+    if (!session?.user?.id) {
+      setIsAdminUser(false);
+      return;
+    }
+
+    let cancelled = false;
+    (async () => {
+      const { data, error: adminError } = await adminApi.isAdminUser(supabase);
+      if (cancelled) return;
+      if (adminError) {
+        setIsAdminUser(false);
+        return;
+      }
+      setIsAdminUser(Boolean(data));
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [session?.user?.id]);
+
+  useEffect(() => {
+    if (!session?.user?.id || !profile.studyMetaReady || !pendingBillingSelection) return;
+
+    let cancelled = false;
+    const selection = pendingBillingSelection;
+    setPendingBillingSelection(null);
+
+    (async () => {
+      const result = await subscription.startCheckout(selection);
+      if (cancelled || !result?.error) return;
+      setError(result.error.message || "Nao consegui abrir o checkout.");
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    pendingBillingSelection,
+    profile.studyMetaReady,
+    session?.user?.id,
+    subscription.startCheckout,
+  ]);
 
   const studyContinueOnceRef = useRef(false);
   const skipNextAutoContinueRef = useRef(false);
@@ -1205,12 +1274,15 @@ function App() {
     setAuthFeedback(null);
     setShowOnboarding(false);
     setPreAuthPhase("landing");
+    setPendingBillingSelection(null);
     setMainTab("dashboard");
+    setIsAdminUser(false);
     setStudyFocusMode(false);
     setLastStudyUiChat(false);
     setStudySubTabBoost(null);
     setNavHydrated(false);
     openChatAfterHydrateRef.current = false;
+    profile.resetProfile();
     study.resetAll();
   }
 
@@ -1315,7 +1387,12 @@ function App() {
               <LandingPage
                 warpActive={transitionActive}
                 onStartRegister={() => startAuthTransition("register")}
-                onStartLogin={() => startAuthTransition("login")}
+                onStartLogin={(selection) =>
+                  startAuthTransition("login", selection ? { billingSelection: selection } : undefined)
+                }
+                onSelectPricingPlan={(selection) =>
+                  startAuthTransition("register", { billingSelection: selection })
+                }
               />
               <OrganicSectionsShowcase />
             </>
@@ -1389,7 +1466,12 @@ function App() {
             </button>
           </div>
         ) : (
-          <AppMainNav activeTab={mainTab} onTabChange={setMainTab} />
+          <AppMainNav
+            activeTab={mainTab}
+            onTabChange={setMainTab}
+            isAdmin={isAdminUser}
+            onOpenAdmin={() => navigateToPath("/admin/contests")}
+          />
         )}
       </DashboardHeader>
 

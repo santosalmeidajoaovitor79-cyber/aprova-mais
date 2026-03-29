@@ -22,6 +22,19 @@ function isHttpUrl(value: string) {
   }
 }
 
+function isAllowedClientRedirectUrl(value: string, requestOrigin: string | null) {
+  try {
+    const parsed = new URL(value);
+    if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
+      return false;
+    }
+    if (!requestOrigin) return true;
+    return parsed.origin === requestOrigin;
+  } catch {
+    return false;
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: BILLING_CORS_HEADERS });
@@ -44,6 +57,7 @@ Deno.serve(async (req) => {
     const stripe = createStripeClient();
     const supabaseAdmin = createSupabaseAdminClient();
     const body = await req.json().catch(() => ({}));
+    const requestOrigin = req.headers.get("origin");
 
     const priceId = typeof body?.priceId === "string" ? body.priceId.trim() : "";
     const successUrl = typeof body?.successUrl === "string" ? body.successUrl.trim() : "";
@@ -66,6 +80,18 @@ Deno.serve(async (req) => {
         "BILLING_URL_INVALID",
         400,
         { successUrl, cancelUrl }
+      );
+    }
+
+    if (
+      !isAllowedClientRedirectUrl(successUrl, requestOrigin) ||
+      !isAllowedClientRedirectUrl(cancelUrl, requestOrigin)
+    ) {
+      return billingError(
+        "As URLs de billing precisam voltar para a mesma origem do app.",
+        "BILLING_URL_ORIGIN_NOT_ALLOWED",
+        400,
+        { successUrl, cancelUrl, requestOrigin }
       );
     }
 

@@ -1,7 +1,7 @@
 import { memo } from "react";
-import { BookOpen, LayoutDashboard, UserRound } from "lucide-react";
+import { BookOpen, LayoutDashboard, Shield, UserRound } from "lucide-react";
 
-function AppMainNavComponent({ activeTab, onTabChange }) {
+function AppMainNavComponent({ activeTab, onTabChange, isAdmin = false, onOpenAdmin }) {
   return (
     <nav className="aprova-nav-pills aprova-main-nav-track" aria-label="Navegação principal">
       <button
@@ -28,6 +28,12 @@ function AppMainNavComponent({ activeTab, onTabChange }) {
         <UserRound size={18} strokeWidth={2.2} aria-hidden />
         Perfil
       </button>
+      {isAdmin ? (
+        <button type="button" onClick={onOpenAdmin} className="aprova-nav-pill aprova-main-nav-pill">
+          <Shield size={18} strokeWidth={2.2} aria-hidden />
+          Admin
+        </button>
+      ) : null}
     </nav>
   );
 }

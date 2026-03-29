@@ -29,7 +29,7 @@ export function useSubscription(supabase, session, options = {}) {
     }
 
     setState((prev) => ({ ...prev, loading: true, error: "" }));
-    const { data, error } = await billingApi.fetchOwnSubscription(supabase);
+    const { data, error } = await billingApi.fetchOwnSubscription(supabase, session.user.id);
     if (error) {
       setState((prev) => ({
         ...prev,
@@ -116,7 +116,7 @@ export function useSubscription(supabase, session, options = {}) {
     try {
       console.info("[billing] openBillingPortal");
       const { data } = await billingApi.createPortalSession(supabase, {
-        returnUrl: `${window.location.origin}${window.location.pathname || "/"}`,
+        returnUrl: `${window.location.origin}${window.location.pathname || "/"}?tab=profile`,
       });
       if (!data?.url) throw new Error("Portal sem URL retornada.");
       window.location.assign(data.url);

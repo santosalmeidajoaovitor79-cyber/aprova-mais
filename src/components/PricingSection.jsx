@@ -97,7 +97,11 @@ function PricingSectionComponent({
                   <ArrowRight size={18} />
                 </button>
                 {!loggedIn && onLogin ? (
-                  <button type="button" className="aprova-btn-interactive aprova-landing-secondary" onClick={onLogin}>
+                  <button
+                    type="button"
+                    className="aprova-btn-interactive aprova-landing-secondary"
+                    onClick={() => onLogin({ planKey: plan.key, billingCycle })}
+                  >
                     Já tenho conta
                   </button>
                 ) : null}

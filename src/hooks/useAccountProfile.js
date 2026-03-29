@@ -5,6 +5,12 @@ import * as profilesApi from "../api/profilesApi.js";
  * Campos de perfil + ensure / load / save (usa API isolada).
  */
 export function useAccountProfile(supabase, setError) {
+  const buildDefaultStudyMeta = () => ({
+    mainExamId: null,
+    lastContestId: null,
+    lastSubjectId: null,
+    lastTopicId: null,
+  });
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [goal, setGoal] = useState("Polícia Penal");
@@ -13,12 +19,7 @@ export function useAccountProfile(supabase, setError) {
   const [mainExamId, setMainExamId] = useState("");
   const [onboardingDone, setOnboardingDone] = useState(false);
   const [studyMetaReady, setStudyMetaReady] = useState(false);
-  const [studyMeta, setStudyMeta] = useState({
-    mainExamId: null,
-    lastContestId: null,
-    lastSubjectId: null,
-    lastTopicId: null,
-  });
+  const [studyMeta, setStudyMeta] = useState(buildDefaultStudyMeta);
 
   const ensureProfile = useCallback(
     async (user) => {
@@ -139,6 +140,18 @@ export function useAccountProfile(supabase, setError) {
     [supabase, hours]
   );
 
+  const resetProfile = useCallback(() => {
+    setName("");
+    setEmail("");
+    setGoal("Polícia Penal");
+    setHours("2");
+    setExamDate("");
+    setMainExamId("");
+    setOnboardingDone(false);
+    setStudyMetaReady(false);
+    setStudyMeta(buildDefaultStudyMeta());
+  }, []);
+
   return {
     name,
     setName,
@@ -160,5 +173,6 @@ export function useAccountProfile(supabase, setError) {
     loadProfile,
     saveProfile,
     completeOnboarding,
+    resetProfile,
   };
 }

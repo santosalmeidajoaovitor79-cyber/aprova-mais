@@ -30,6 +30,10 @@ async function syncStripeSubscription(
   const priceId = extractSubscriptionItemPriceId(subscription);
   const mapped = mapPriceToPlan(priceId);
 
+  if (!mapped.planKey || !mapped.billingCycle) {
+    throw new Error(`Price da Stripe sem mapeamento de plano: ${priceId ?? "desconhecido"}.`);
+  }
+
   const existingBySubscriptionId = await getSubscriptionByStripeSubscriptionId(supabaseAdmin, subscription.id);
   if (existingBySubscriptionId.error) throw existingBySubscriptionId.error;
 
@@ -77,6 +81,10 @@ async function syncCheckoutCompleted(
   const priceId = session.metadata?.selected_price_id ?? null;
   const mapped = mapPriceToPlan(priceId);
 
+  if (priceId && (!mapped.planKey || !mapped.billingCycle)) {
+    throw new Error(`Checkout concluido com price sem mapeamento: ${priceId}.`);
+  }
+
   if (userId) {
     const pending = await upsertSubscriptionSnapshot(supabaseAdmin, {
       user_id: userId,
@@ -99,29 +107,13 @@ async function syncCheckoutCompleted(
 async function syncInvoiceSubscription(
   stripe: Stripe,
   supabaseAdmin: ReturnType<typeof createSupabaseAdminClient>,
-  invoice: Stripe.Invoice,
-  fallbackStatus?: string
+  invoice: Stripe.Invoice
 ) {
   const subscriptionId =
     typeof invoice.subscription === "string" ? invoice.subscription : invoice.subscription?.id ?? null;
   if (!subscriptionId) return;
   const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-  const synced = await syncStripeSubscription(stripe, supabaseAdmin, subscription);
-
-  if (fallbackStatus && synced?.user_id) {
-    const result = await upsertSubscriptionSnapshot(supabaseAdmin, {
-      user_id: synced.user_id,
-      stripe_customer_id: synced.stripe_customer_id,
-      stripe_subscription_id: synced.stripe_subscription_id,
-      stripe_price_id: synced.stripe_price_id,
-      plan_key: synced.plan_key,
-      billing_cycle: synced.billing_cycle,
-      current_period_end: synced.current_period_end,
-      cancel_at_period_end: synced.cancel_at_period_end,
-      status: fallbackStatus,
-    });
-    if (result.error) throw result.error;
-  }
+  await syncStripeSubscription(stripe, supabaseAdmin, subscription);
 }
 
 Deno.serve(async (req) => {
@@ -176,13 +168,13 @@ Deno.serve(async (req) => {
 
       case "invoice.paid": {
         const invoice = event.data.object as Stripe.Invoice;
-        await syncInvoiceSubscription(stripe, supabaseAdmin, invoice, "active");
+        await syncInvoiceSubscription(stripe, supabaseAdmin, invoice);
         break;
       }
 
       case "invoice.payment_failed": {
         const invoice = event.data.object as Stripe.Invoice;
-        await syncInvoiceSubscription(stripe, supabaseAdmin, invoice, "past_due");
+        await syncInvoiceSubscription(stripe, supabaseAdmin, invoice);
         break;
       }
 
@@ -197,7 +189,7 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error(`[${LOG_CTX}] erro no webhook`, error);
-    return billingError("Falha ao processar webhook Stripe.", "STRIPE_WEBHOOK_FAILED", 400, {
+    return billingError("Falha ao processar webhook Stripe.", "STRIPE_WEBHOOK_FAILED", 500, {
       message: error instanceof Error ? error.message : String(error),
     });
   }
