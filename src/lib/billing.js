@@ -21,12 +21,12 @@ export const BILLING_PLANS = {
     prices: {
       monthly: {
         priceId: "price_1TGG1XBBsAS1lAp1UGeMhyj0",
-        amountLabel: "R$ 39",
+        amountLabel: "R$ 9,90",
         cadenceLabel: "/mês",
       },
       yearly: {
         priceId: "price_1TGGHuBBsAS1lAp14HcpcTHS",
-        amountLabel: "R$ 390",
+        amountLabel: "R$ 99,00",
         cadenceLabel: "/ano",
       },
     },
@@ -43,12 +43,12 @@ export const BILLING_PLANS = {
     prices: {
       monthly: {
         priceId: "price_1TGG3CBBsAS1lAp12hzsTwcu",
-        amountLabel: "R$ 79",
+        amountLabel: "R$ 29,90",
         cadenceLabel: "/mês",
       },
       yearly: {
         priceId: "price_1TGGGtBBsAS1lAp1j6wF62D9",
-        amountLabel: "R$ 790",
+        amountLabel: "R$ 297,00",
         cadenceLabel: "/ano",
       },
     },

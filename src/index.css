@@ -1434,6 +1434,34 @@ body {
   box-shadow: 0 0 0 4px rgba(122, 92, 255, 0.12);
 }
 
+.aprova-auth-password-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #9ca3b7;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    color var(--aprova-duration) var(--aprova-easing),
+    background var(--aprova-duration) var(--aprova-easing),
+    transform var(--aprova-duration) var(--aprova-easing);
+}
+
+.aprova-auth-password-toggle:hover {
+  color: #f5f7ff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.aprova-auth-password-toggle:focus-visible {
+  outline: 2px solid rgba(156, 126, 255, 0.7);
+  outline-offset: 2px;
+}
+
 .aprova-auth-form-note {
   margin-top: 4px;
   border-radius: 16px;

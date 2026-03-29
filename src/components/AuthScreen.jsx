@@ -1,5 +1,17 @@
-import { memo, useMemo } from "react";
-import { ArrowRight, CheckCircle2, CircleAlert, Lock, Mail, MailCheck, Shield, Sparkles, User } from "lucide-react";
+import { memo, useMemo, useState } from "react";
+import {
+  ArrowRight,
+  CheckCircle2,
+  CircleAlert,
+  Eye,
+  EyeOff,
+  Lock,
+  Mail,
+  MailCheck,
+  Shield,
+  Sparkles,
+  User,
+} from "lucide-react";
 import { styles } from "../styles/appStyles.js";
 
 const benefitCards = [
@@ -45,6 +57,8 @@ function AuthScreenComponent({
   onBackToLanding,
 }) {
   const isLogin = mode === "login";
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   const feedback = authFeedback || (error ? { kind: "error", title: "Algo travou aqui.", message: error } : null);
 
   const formTitle = useMemo(
@@ -229,9 +243,18 @@ function AuthScreenComponent({
                     onChange={(e) => setPassword(e.target.value)}
                     style={styles.input}
                     placeholder="Digite sua senha"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     autoComplete={!isLogin ? "new-password" : "current-password"}
                   />
+                  <button
+                    type="button"
+                    className="aprova-auth-password-toggle"
+                    onClick={() => setShowPassword((value) => !value)}
+                    aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                    aria-pressed={showPassword}
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
                 </div>
               </label>
 
@@ -245,9 +268,18 @@ function AuthScreenComponent({
                       onChange={(e) => setPasswordConfirm(e.target.value)}
                       style={styles.input}
                       placeholder="Repita sua senha"
-                      type="password"
+                      type={showPasswordConfirm ? "text" : "password"}
                       autoComplete="new-password"
                     />
+                    <button
+                      type="button"
+                      className="aprova-auth-password-toggle"
+                      onClick={() => setShowPasswordConfirm((value) => !value)}
+                      aria-label={showPasswordConfirm ? "Ocultar confirmação de senha" : "Mostrar confirmação de senha"}
+                      aria-pressed={showPasswordConfirm}
+                    >
+                      {showPasswordConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
                   </div>
                 </label>
               ) : null}

@@ -317,17 +317,6 @@ function App() {
     [bumpStudyInsightsRefresh, onQuestionRevealedForMission]
   );
 
-  const handleUpgradeToPro = useCallback(() => {
-    if (subscription.access?.isPro) {
-      void subscription.openBillingPortal?.();
-      return;
-    }
-    void subscription.startCheckout?.({
-      planKey: "pro",
-      billingCycle: featureAccess.recommendedUpgrade?.billingCycle || "monthly",
-    });
-  }, [featureAccess.recommendedUpgrade?.billingCycle, subscription]);
-
   const study = useStudyArea(
     supabase,
     session,
@@ -1463,8 +1452,6 @@ function App() {
               onOpenStudyTab={handleOpenStudyBare}
               onMissionAction={handleMissionAction}
               onResumeAction={handleResumeJourneyAction}
-            featureAccess={featureAccess}
-            onUpgradeToPro={handleUpgradeToPro}
             />
           </div>
         ) : null}
@@ -1600,9 +1587,6 @@ function App() {
             }
             yaraMiniSessionUi={study.yaraMiniSessionUi}
             examReadiness={examReadiness}
-            featureAccess={featureAccess}
-            usageQuota={usageQuota}
-            onUpgradeToPro={handleUpgradeToPro}
           />
           </div>
         </div>

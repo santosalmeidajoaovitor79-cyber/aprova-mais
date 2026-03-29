@@ -13,6 +13,15 @@ import {
 
 const LOG_CTX = "create-checkout-session";
 
+function isHttpUrl(value: string) {
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === "https:" || parsed.protocol === "http:";
+  } catch {
+    return false;
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: BILLING_CORS_HEADERS });
@@ -40,8 +49,24 @@ Deno.serve(async (req) => {
     const successUrl = typeof body?.successUrl === "string" ? body.successUrl.trim() : "";
     const cancelUrl = typeof body?.cancelUrl === "string" ? body.cancelUrl.trim() : "";
 
+    console.log(`[${LOG_CTX}] payload recebido`, {
+      userId: authResult.user.id,
+      priceId,
+      successUrlPresent: Boolean(successUrl),
+      cancelUrlPresent: Boolean(cancelUrl),
+    });
+
     if (!priceId || !successUrl || !cancelUrl) {
       return billingError("priceId, successUrl e cancelUrl são obrigatórios.", "BILLING_VALIDATION_ERROR", 400);
+    }
+
+    if (!isHttpUrl(successUrl) || !isHttpUrl(cancelUrl)) {
+      return billingError(
+        "As URLs de sucesso e cancelamento precisam ser válidas.",
+        "BILLING_URL_INVALID",
+        400,
+        { successUrl, cancelUrl }
+      );
     }
 
     if (!isSupportedPriceId(priceId)) {
@@ -61,6 +86,15 @@ Deno.serve(async (req) => {
       return billingError("Não consegui carregar o perfil do usuário.", "PROFILE_FETCH_ERROR", 500);
     }
 
+    if (!profileResult.data?.id) {
+      return billingError(
+        "Seu perfil ainda não está pronto para iniciar a assinatura. Atualize a página e tente novamente.",
+        "PROFILE_NOT_FOUND",
+        409,
+        { userId: authResult.user.id }
+      );
+    }
+
     const profileEmail = profileResult.data?.email?.trim() || authResult.user.email?.trim() || "";
     if (!profileEmail) {
       return billingError("Seu usuário precisa ter e-mail para iniciar a assinatura.", "BILLING_EMAIL_REQUIRED", 400);
@@ -75,8 +109,9 @@ Deno.serve(async (req) => {
     });
 
     const mapped = mapPriceToPlan(priceId);
+    console.log(`[${LOG_CTX}] price mapeado`, { priceId, mapped });
 
-    await upsertSubscriptionSnapshot(supabaseAdmin, {
+    const snapshotResult = await upsertSubscriptionSnapshot(supabaseAdmin, {
       user_id: authResult.user.id,
       stripe_customer_id: customerId,
       stripe_price_id: priceId,
@@ -84,6 +119,15 @@ Deno.serve(async (req) => {
       billing_cycle: mapped.billingCycle,
       status: "checkout_pending",
     });
+    if (snapshotResult.error) {
+      console.error(`[${LOG_CTX}] erro ao salvar snapshot checkout_pending`, snapshotResult.error);
+      return billingError(
+        "Não consegui preparar sua assinatura para o checkout.",
+        "SUBSCRIPTION_SNAPSHOT_FAILED",
+        500,
+        { message: snapshotResult.error.message }
+      );
+    }
 
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
@@ -114,6 +158,13 @@ Deno.serve(async (req) => {
       allow_promotion_codes: true,
     });
 
+    console.log(`[${LOG_CTX}] checkout session criada`, {
+      userId: authResult.user.id,
+      stripeCustomerId: customerId,
+      sessionId: session.id,
+      hasUrl: Boolean(session.url),
+    });
+
     return new Response(
       JSON.stringify({
         url: session.url,
@@ -126,6 +177,8 @@ Deno.serve(async (req) => {
     );
   } catch (error) {
     console.error(`[${LOG_CTX}] erro inesperado`, error);
-    return billingError("Não consegui iniciar o checkout Stripe agora.", "CHECKOUT_SESSION_CREATE_FAILED", 500);
+    return billingError("Não consegui iniciar o checkout Stripe agora.", "CHECKOUT_SESSION_CREATE_FAILED", 500, {
+      message: error instanceof Error ? error.message : String(error),
+    });
   }
 });

@@ -84,16 +84,17 @@ export function useSubscription(supabase, session, options = {}) {
         const currentPath = window.location.pathname || "/";
         const successUrl = `${origin}${currentPath}?billing=success&tab=profile`;
         const cancelUrl = `${origin}${currentPath}?billing=cancel&tab=profile`;
-        const { data, error } = await billingApi.createCheckoutSession(supabase, {
+        console.info("[billing] startCheckout", { planKey, billingCycle, currentPath });
+        const { data } = await billingApi.createCheckoutSession(supabase, {
           priceId: price.priceId,
           successUrl,
           cancelUrl,
         });
-        if (error) throw error;
         if (!data?.url) throw new Error("Checkout sem URL retornada.");
         window.location.assign(data.url);
         return { error: null };
       } catch (error) {
+        console.error("[billing] startCheckout failed", error);
         setState((prev) => ({
           ...prev,
           checkoutBusy: false,
@@ -113,14 +114,15 @@ export function useSubscription(supabase, session, options = {}) {
 
     setState((prev) => ({ ...prev, portalBusy: true, error: "" }));
     try {
-      const { data, error } = await billingApi.createPortalSession(supabase, {
+      console.info("[billing] openBillingPortal");
+      const { data } = await billingApi.createPortalSession(supabase, {
         returnUrl: `${window.location.origin}${window.location.pathname || "/"}`,
       });
-      if (error) throw error;
       if (!data?.url) throw new Error("Portal sem URL retornada.");
       window.location.assign(data.url);
       return { error: null };
     } catch (error) {
+      console.error("[billing] openBillingPortal failed", error);
       setState((prev) => ({
         ...prev,
         portalBusy: false,
