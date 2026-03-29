@@ -120,5 +120,25 @@ export async function syncRuntimeContest(supabase, contestCatalogId) {
 }
 
 export async function fetchAdminYaraReportSignals(supabase) {
-  return supabase.rpc("admin_yara_report_signals");
+  const response = await supabase.rpc("admin_yara_report_signals");
+  const message = String(response?.error?.message ?? "").toLowerCase();
+  const details = String(response?.error?.details ?? "").toLowerCase();
+  const code = String(response?.error?.code ?? "").toUpperCase();
+
+  const missingFunction =
+    code === "PGRST202" ||
+    message.includes("schema cache") ||
+    message.includes("could not find the function") ||
+    details.includes("schema cache");
+
+  if (missingFunction) {
+    return {
+      data: null,
+      error: new Error(
+        "A função SQL do relatório ainda não foi publicada no Supabase. Rode `supabase db push` para aplicar a migration `20260328140000_admin_yara_report_signals.sql` e atualize a página."
+      ),
+    };
+  }
+
+  return response;
 }

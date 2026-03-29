@@ -33,6 +33,36 @@ export function billingError(message: string, code: string, status = 400, detail
   );
 }
 
+/** Stripe/deno às vezes lançam objetos que não passam em `instanceof Error` — evita `details.message: "[object Object]"`. */
+export function formatStripeOrUnknownError(error: unknown): string {
+  if (error instanceof Error && typeof error.message === "string" && error.message.length > 0) {
+    return error.message;
+  }
+  if (typeof error === "string") {
+    return error;
+  }
+  if (error && typeof error === "object") {
+    const o = error as Record<string, unknown>;
+    if (typeof o.message === "string" && o.message.length > 0) {
+      return o.message;
+    }
+    const raw = o.raw;
+    if (raw && typeof raw === "object") {
+      const r = raw as Record<string, unknown>;
+      if (typeof r.message === "string" && r.message.length > 0) {
+        return r.message;
+      }
+    }
+    try {
+      const s = JSON.stringify(o);
+      return s.length > 900 ? `${s.slice(0, 900)}…` : s;
+    } catch {
+      return "Erro desconhecido (objeto não serializável)";
+    }
+  }
+  return String(error);
+}
+
 export function assertBillingEnv(requiredKeys: string[], logContext: string): Response | null {
   const missing = requiredKeys.filter((key) => !Deno.env.get(key));
   if (!missing.length) return null;
@@ -69,13 +99,16 @@ export function isSupportedPriceId(priceId: string | null | undefined) {
   return Boolean(STRIPE_PRICE_MAP[priceId as StripePriceMapKey]);
 }
 
+const SUBSCRIPTION_SELECT =
+  "id, user_id, stripe_customer_id, stripe_subscription_id, stripe_price_id, plan_key, billing_cycle, status, current_period_end, cancel_at_period_end";
+
 export async function getSubscriptionByUserId(supabaseAdmin: SupabaseClient, userId: string) {
   return supabaseAdmin
     .from("subscriptions")
-    .select(
-      "id, user_id, stripe_customer_id, stripe_subscription_id, stripe_price_id, plan_key, billing_cycle, status, current_period_end, cancel_at_period_end"
-    )
+    .select(SUBSCRIPTION_SELECT)
     .eq("user_id", userId)
+    .order("updated_at", { ascending: false })
+    .limit(1)
     .maybeSingle();
 }
 
@@ -85,9 +118,7 @@ export async function getSubscriptionByStripeSubscriptionId(
 ) {
   return supabaseAdmin
     .from("subscriptions")
-    .select(
-      "id, user_id, stripe_customer_id, stripe_subscription_id, stripe_price_id, plan_key, billing_cycle, status, current_period_end, cancel_at_period_end"
-    )
+    .select(SUBSCRIPTION_SELECT)
     .eq("stripe_subscription_id", stripeSubscriptionId)
     .maybeSingle();
 }
@@ -110,26 +141,43 @@ export async function upsertSubscriptionSnapshot(
     cancel_at_period_end?: boolean | null;
   }
 ) {
-  return supabaseAdmin
+  const row = {
+    user_id: payload.user_id,
+    stripe_customer_id: payload.stripe_customer_id ?? null,
+    stripe_subscription_id: payload.stripe_subscription_id ?? null,
+    stripe_price_id: payload.stripe_price_id ?? null,
+    plan_key: payload.plan_key ?? null,
+    billing_cycle: payload.billing_cycle ?? null,
+    status: payload.status ?? "inactive",
+    current_period_end: payload.current_period_end ?? null,
+    cancel_at_period_end: payload.cancel_at_period_end ?? false,
+  };
+
+  // Não usar .upsert(onConflict: user_id): em bancos com drift a tabela pode existir sem UNIQUE(user_id)
+  // e o Postgres retorna 42P10. Insert/update explícito funciona sempre.
+  const { data: existingRows, error: selectError } = await supabaseAdmin
     .from("subscriptions")
-    .upsert(
-      {
-        user_id: payload.user_id,
-        stripe_customer_id: payload.stripe_customer_id ?? null,
-        stripe_subscription_id: payload.stripe_subscription_id ?? null,
-        stripe_price_id: payload.stripe_price_id ?? null,
-        plan_key: payload.plan_key ?? null,
-        billing_cycle: payload.billing_cycle ?? null,
-        status: payload.status ?? "inactive",
-        current_period_end: payload.current_period_end ?? null,
-        cancel_at_period_end: payload.cancel_at_period_end ?? false,
-      },
-      { onConflict: "user_id" }
-    )
-    .select(
-      "id, user_id, stripe_customer_id, stripe_subscription_id, stripe_price_id, plan_key, billing_cycle, status, current_period_end, cancel_at_period_end"
-    )
-    .maybeSingle();
+    .select("id")
+    .eq("user_id", payload.user_id)
+    .order("updated_at", { ascending: false })
+    .limit(1);
+
+  if (selectError) {
+    return { data: null, error: selectError };
+  }
+
+  const existingId = existingRows?.[0]?.id ?? null;
+
+  if (existingId) {
+    return supabaseAdmin
+      .from("subscriptions")
+      .update(row)
+      .eq("id", existingId)
+      .select(SUBSCRIPTION_SELECT)
+      .maybeSingle();
+  }
+
+  return supabaseAdmin.from("subscriptions").insert(row).select(SUBSCRIPTION_SELECT).maybeSingle();
 }
 
 export async function findOrCreateStripeCustomer(params: {

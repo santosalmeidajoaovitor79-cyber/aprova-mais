@@ -6,6 +6,7 @@ import {
   createStripeClient,
   createSupabaseAdminClient,
   findOrCreateStripeCustomer,
+  formatStripeOrUnknownError,
   isSupportedPriceId,
   mapPriceToPlan,
   upsertSubscriptionSnapshot,
@@ -202,9 +203,10 @@ Deno.serve(async (req) => {
       }
     );
   } catch (error) {
-    console.error(`[${LOG_CTX}] erro inesperado`, error);
+    const detailMessage = formatStripeOrUnknownError(error);
+    console.error(`[${LOG_CTX}] erro inesperado`, error, { detailMessage });
     return billingError("Não consegui iniciar o checkout Stripe agora.", "CHECKOUT_SESSION_CREATE_FAILED", 500, {
-      message: error instanceof Error ? error.message : String(error),
+      message: detailMessage,
     });
   }
 });

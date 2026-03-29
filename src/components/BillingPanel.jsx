@@ -113,7 +113,7 @@ function BillingPanelComponent({
               <button
                 type="button"
                 className="aprova-organic-primary-btn"
-                disabled={loading || checkoutBusy}
+                disabled={loading || checkoutBusy || (isCurrent && portalBusy)}
                 onClick={() => {
                   if (isCurrent) {
                     void onManageSubscription?.();

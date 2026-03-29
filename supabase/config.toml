@@ -417,15 +417,17 @@ verify_jwt = false
 import_map = "./functions/explain-quiz-mistake/deno.json"
 entrypoint = "./functions/explain-quiz-mistake/index.ts"
 
+# verify_jwt = false: o gateway do Supabase rejeita alguns JWT (ex.: ES256 / chaves assimétricas) com 401
+# antes de rodar a função. A validação real fica em resolveAuthenticatedUser → auth.getUser(jwt).
 [functions.create-checkout-session]
 enabled = true
-verify_jwt = true
+verify_jwt = false
 import_map = "./functions/create-checkout-session/deno.json"
 entrypoint = "./functions/create-checkout-session/index.ts"
 
 [functions.create-portal-session]
 enabled = true
-verify_jwt = true
+verify_jwt = false
 import_map = "./functions/create-portal-session/deno.json"
 entrypoint = "./functions/create-portal-session/index.ts"
 

@@ -21,12 +21,26 @@ comment on table public.topic_question_attempts is 'Cada linha = uma revelação
 
 alter table public.topic_question_attempts enable row level security;
 
-create policy "topic_question_attempts_select_own"
-  on public.topic_question_attempts for select
-  to authenticated
-  using (auth.uid() = user_id);
+do $migration$
+begin
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public' and tablename = 'topic_question_attempts' and policyname = 'topic_question_attempts_select_own'
+  ) then
+    create policy "topic_question_attempts_select_own"
+      on public.topic_question_attempts for select
+      to authenticated
+      using (auth.uid() = user_id);
+  end if;
 
-create policy "topic_question_attempts_insert_own"
-  on public.topic_question_attempts for insert
-  to authenticated
-  with check (auth.uid() = user_id);
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public' and tablename = 'topic_question_attempts' and policyname = 'topic_question_attempts_insert_own'
+  ) then
+    create policy "topic_question_attempts_insert_own"
+      on public.topic_question_attempts for insert
+      to authenticated
+      with check (auth.uid() = user_id);
+  end if;
+end
+$migration$;

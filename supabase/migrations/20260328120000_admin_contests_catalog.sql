@@ -21,6 +21,43 @@ create table if not exists public.contests_catalog (
 create index if not exists contests_catalog_area_year_idx
   on public.contests_catalog (area, predicted_year, predicted_month, name);
 
+-- Bancos com drift: a tabela pode existir sem UNIQUE em name; seed usa ON CONFLICT (name).
+do $migration$
+declare
+  has_unique_name boolean;
+begin
+  select exists (
+    select 1
+    from information_schema.table_constraints tc
+    join information_schema.key_column_usage kcu
+      on tc.constraint_schema = kcu.constraint_schema
+     and tc.constraint_name = kcu.constraint_name
+    where tc.table_schema = 'public'
+      and tc.table_name = 'contests_catalog'
+      and tc.constraint_type = 'UNIQUE'
+      and kcu.column_name = 'name'
+  )
+  or exists (
+    select 1
+    from pg_indexes
+    where schemaname = 'public'
+      and tablename = 'contests_catalog'
+      and indexdef ilike '%unique%'
+      and indexdef ~ '\(name\)'
+  )
+  into has_unique_name;
+
+  if not has_unique_name then
+    create unique index contests_catalog_name_unique_idx on public.contests_catalog (name);
+  end if;
+exception
+  when unique_violation then
+    raise notice 'contests_catalog: nao foi possivel criar indice unico em name (valores duplicados).';
+  when duplicate_object then
+    null;
+end
+$migration$;
+
 create or replace function public.is_admin_user()
 returns boolean
 language sql

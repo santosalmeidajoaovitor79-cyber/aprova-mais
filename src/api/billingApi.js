@@ -1,62 +1,110 @@
-async function buildInvokeError(error, functionName) {
-  let message = error?.message || `Falha ao chamar ${functionName}.`;
-  let details = null;
+import {
+  supabase,
+  SUPABASE_PUBLIC_ANON_KEY,
+  SUPABASE_PUBLIC_URL,
+} from "../lib/supabaseClient.js";
 
-  if (error?.context) {
-    try {
-      const cloned = error.context.clone();
-      const json = await cloned.json();
-      details = json?.details ?? null;
-      if (typeof json?.error === "string" && json.error.trim()) {
-        message = json.error.trim();
-      }
-    } catch {
-      try {
-        const text = await error.context.text();
-        if (typeof text === "string" && text.trim()) {
-          message = text.trim();
-        }
-      } catch {
-        // ignore parse failure and keep original message
-      }
+function parseFunctionsJsonResponse(text) {
+  if (!text) return null;
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+}
+
+function devBillingLog(label, payload) {
+  if (import.meta.env.DEV) {
+    console.info(`[Aprova][billing] ${label}`, payload);
+  }
+}
+
+/**
+ * Chama Edge Function de billing via fetch com Authorization (JWT) + apikey (anon).
+ * Usa sempre o `supabase` singleton de supabaseClient.js (mesma instância do login).
+ */
+async function invokeBillingFunction(functionName, body, { accessToken: accessTokenOverride } = {}) {
+  const supabaseUrl = SUPABASE_PUBLIC_URL;
+  const anonKey = SUPABASE_PUBLIC_ANON_KEY;
+
+  let accessToken = accessTokenOverride ?? null;
+  if (!accessToken) {
+    const { data, error: sessionReadError } = await supabase.auth.getSession();
+    if (import.meta.env.DEV) {
+      console.log("[Aprova][billing] session", data?.session ?? null);
     }
+    if (sessionReadError) {
+      console.warn("[Aprova][billing] getSession error", sessionReadError.message);
+    }
+    accessToken = data?.session?.access_token ?? null;
   }
 
-  const wrapped = new Error(message);
-  wrapped.cause = error;
-  wrapped.details = details;
-  wrapped.functionName = functionName;
-  return wrapped;
-}
-
-async function invokeBillingFunction(supabase, functionName, body) {
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  const headers = {};
-  if (session?.access_token) {
-    headers.Authorization = `Bearer ${session.access_token}`;
+  if (!accessToken) {
+    throw new Error("Faça login para continuar.");
   }
 
-  console.info(`[billing] invoking ${functionName}`, {
-    hasSession: Boolean(session?.access_token),
-    payloadKeys: body ? Object.keys(body) : [],
+  if (!supabaseUrl || !anonKey) {
+    throw new Error("Configuração do Supabase ausente. Verifique VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY.");
+  }
+
+  if (import.meta.env.DEV) {
+    let userId = null;
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser(accessToken);
+      userId = user?.id ?? null;
+    } catch {
+      userId = "(getUser falhou — só log)";
+    }
+    let fnHost = supabaseUrl;
+    try {
+      fnHost = new URL(supabaseUrl.startsWith("http") ? supabaseUrl : `https://${supabaseUrl}`).host;
+    } catch {
+      /* ignore */
+    }
+    devBillingLog(`invoke → ${functionName}`, {
+      functionsHost: fnHost,
+      hasSession: Boolean(accessToken),
+      userId,
+      tokenTail: accessToken.length > 10 ? `…${accessToken.slice(-8)}` : "(curto)",
+    });
+  }
+
+  const url = `${supabaseUrl}/functions/v1/${functionName}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+      apikey: anonKey,
+    },
+    body: JSON.stringify(body ?? {}),
   });
 
-  const result = await supabase.functions.invoke(functionName, {
-    body,
-    headers,
-  });
+  const text = await res.text();
+  const parsed = parseFunctionsJsonResponse(text);
 
-  if (result.error) {
-    throw await buildInvokeError(result.error, functionName);
+  if (!res.ok) {
+    let message = `Não foi possível concluir a operação (${res.status}).`;
+    if (parsed && typeof parsed.error === "string" && parsed.error.trim()) {
+      message = parsed.error.trim();
+    } else if (parsed && typeof parsed.message === "string" && parsed.message.trim()) {
+      message = parsed.message.trim();
+    } else if (text?.trim()) {
+      message = text.trim();
+    }
+    const wrapped = new Error(message);
+    wrapped.status = res.status;
+    wrapped.details = parsed?.details;
+    wrapped.code = parsed?.code;
+    throw wrapped;
   }
 
-  return result;
+  return { data: parsed, error: null };
 }
 
-export async function fetchOwnSubscription(supabase, userId) {
+export async function fetchOwnSubscription(userId) {
   if (!userId) {
     return { data: null, error: new Error("AUTH_REQUIRED") };
   }
@@ -70,10 +118,10 @@ export async function fetchOwnSubscription(supabase, userId) {
     .maybeSingle();
 }
 
-export async function createCheckoutSession(supabase, payload) {
-  return invokeBillingFunction(supabase, "create-checkout-session", payload);
+export async function createCheckoutSession(payload, invokeOptions) {
+  return invokeBillingFunction("create-checkout-session", payload, invokeOptions);
 }
 
-export async function createPortalSession(supabase, payload) {
-  return invokeBillingFunction(supabase, "create-portal-session", payload);
+export async function createPortalSession(payload, invokeOptions) {
+  return invokeBillingFunction("create-portal-session", payload, invokeOptions);
 }

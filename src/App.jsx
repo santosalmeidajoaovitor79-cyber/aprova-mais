@@ -193,7 +193,13 @@ function App() {
   const { session, loading } = useAuthSession(setErrorStable);
 
   const profile = useAccountProfile(supabase, setErrorStable);
-  const subscription = useSubscription(supabase, session);
+  const handleBillingRequireAuth = useCallback(() => {
+    setMessage("Sua sessão precisa ser renovada. Faça login de novo para usar pagamento ou o portal.");
+  }, []);
+
+  const subscription = useSubscription(supabase, session, {
+    onRequireAuth: handleBillingRequireAuth,
+  });
   const usageQuota = useUsageQuota(supabase, session, subscription.access);
   const featureAccess = useFeatureAccess(subscription.access, usageQuota.usage);
 

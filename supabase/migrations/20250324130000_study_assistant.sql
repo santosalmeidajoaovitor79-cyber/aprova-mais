@@ -37,65 +37,126 @@ create index if not exists user_topic_visits_user_time_idx
 
 alter table public.user_topic_visits enable row level security;
 
-create policy "user_topic_visits_select_own"
-  on public.user_topic_visits for select
-  to authenticated
-  using (auth.uid() = user_id);
+do $migration$
+begin
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public' and tablename = 'user_topic_visits' and policyname = 'user_topic_visits_select_own'
+  ) then
+    create policy "user_topic_visits_select_own"
+      on public.user_topic_visits for select
+      to authenticated
+      using (auth.uid() = user_id);
+  end if;
 
-create policy "user_topic_visits_insert_own"
-  on public.user_topic_visits for insert
-  to authenticated
-  with check (auth.uid() = user_id);
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public' and tablename = 'user_topic_visits' and policyname = 'user_topic_visits_insert_own'
+  ) then
+    create policy "user_topic_visits_insert_own"
+      on public.user_topic_visits for insert
+      to authenticated
+      with check (auth.uid() = user_id);
+  end if;
 
-create policy "user_topic_visits_update_own"
-  on public.user_topic_visits for update
-  to authenticated
-  using (auth.uid() = user_id)
-  with check (auth.uid() = user_id);
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public' and tablename = 'user_topic_visits' and policyname = 'user_topic_visits_update_own'
+  ) then
+    create policy "user_topic_visits_update_own"
+      on public.user_topic_visits for update
+      to authenticated
+      using (auth.uid() = user_id)
+      with check (auth.uid() = user_id);
+  end if;
+end
+$migration$;
 
 -- Concurso próprio
-create policy "contests_insert_own"
-  on public.contests for insert
-  to authenticated
-  with check (owner_user_id = auth.uid());
+do $migration$
+begin
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public' and tablename = 'contests' and policyname = 'contests_insert_own'
+  ) then
+    create policy "contests_insert_own"
+      on public.contests for insert
+      to authenticated
+      with check (owner_user_id = auth.uid());
+  end if;
 
-create policy "contests_update_own"
-  on public.contests for update
-  to authenticated
-  using (owner_user_id = auth.uid() and owner_user_id is not null)
-  with check (owner_user_id = auth.uid());
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public' and tablename = 'contests' and policyname = 'contests_update_own'
+  ) then
+    create policy "contests_update_own"
+      on public.contests for update
+      to authenticated
+      using (owner_user_id = auth.uid() and owner_user_id is not null)
+      with check (owner_user_id = auth.uid());
+  end if;
 
-create policy "contests_delete_own"
-  on public.contests for delete
-  to authenticated
-  using (owner_user_id = auth.uid() and owner_user_id is not null);
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public' and tablename = 'contests' and policyname = 'contests_delete_own'
+  ) then
+    create policy "contests_delete_own"
+      on public.contests for delete
+      to authenticated
+      using (owner_user_id = auth.uid() and owner_user_id is not null);
+  end if;
+end
+$migration$;
 
 -- Matérias/tópicos só em concursos do usuário
-create policy "subjects_insert_owned_contest"
-  on public.subjects for insert
-  to authenticated
-  with check (
-    exists (
-      select 1 from public.contests c
-      where c.id = contest_id and c.owner_user_id = auth.uid()
-    )
-  );
+do $migration$
+begin
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public' and tablename = 'subjects' and policyname = 'subjects_insert_owned_contest'
+  ) then
+    create policy "subjects_insert_owned_contest"
+      on public.subjects for insert
+      to authenticated
+      with check (
+        exists (
+          select 1 from public.contests c
+          where c.id = contest_id and c.owner_user_id = auth.uid()
+        )
+      );
+  end if;
 
-create policy "topics_insert_owned_subject"
-  on public.topics for insert
-  to authenticated
-  with check (
-    exists (
-      select 1 from public.subjects s
-      join public.contests c on c.id = s.contest_id
-      where s.id = subject_id and c.owner_user_id = auth.uid()
-    )
-  );
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public' and tablename = 'topics' and policyname = 'topics_insert_owned_subject'
+  ) then
+    create policy "topics_insert_owned_subject"
+      on public.topics for insert
+      to authenticated
+      with check (
+        exists (
+          select 1 from public.subjects s
+          join public.contests c on c.id = s.contest_id
+          where s.id = subject_id and c.owner_user_id = auth.uid()
+        )
+      );
+  end if;
+end
+$migration$;
 
 -- Leitura de concursos: globais OU meus
 drop policy if exists "contests_select_authenticated" on public.contests;
 
-create policy "contests_select_authenticated"
-  on public.contests for select
-  to authenticated
-  using (owner_user_id is null or owner_user_id = auth.uid());
+do $migration$
+begin
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public' and tablename = 'contests' and policyname = 'contests_select_authenticated'
+  ) then
+    create policy "contests_select_authenticated"
+      on public.contests for select
+      to authenticated
+      using (owner_user_id is null or owner_user_id = auth.uid());
+  end if;
+end
+$migration$;

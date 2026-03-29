@@ -18,6 +18,65 @@ create table if not exists public.contest_subject_topics (
   unique (contest_subject_id, name)
 );
 
+-- Drift: tabelas podem ter sido criadas antes sem weight/display_order/created_at.
+alter table public.contest_subjects
+  add column if not exists weight numeric(6,2) not null default 1,
+  add column if not exists display_order integer not null default 0,
+  add column if not exists created_at timestamptz not null default now();
+
+alter table public.contest_subject_topics
+  add column if not exists weight numeric(6,2) not null default 1,
+  add column if not exists display_order integer not null default 0,
+  add column if not exists created_at timestamptz not null default now();
+
+-- Drift: tabela antiga pode existir sem UNIQUE (contest_id, name) / (contest_subject_id, name) para ON CONFLICT.
+do $migration$
+begin
+  if not exists (
+    select 1
+    from information_schema.table_constraints tc
+    where tc.table_schema = 'public'
+      and tc.table_name = 'contest_subjects'
+      and tc.constraint_type = 'UNIQUE'
+      and (
+        select array_agg(kcu.column_name::text order by kcu.ordinal_position)
+        from information_schema.key_column_usage kcu
+        where kcu.constraint_schema = tc.constraint_schema
+          and kcu.constraint_name = tc.constraint_name
+          and kcu.table_schema = tc.table_schema
+          and kcu.table_name = tc.table_name
+      ) = array['contest_id', 'name']::text[]
+  ) then
+    create unique index contest_subjects_contest_id_name_uidx
+      on public.contest_subjects (contest_id, name);
+  end if;
+
+  if not exists (
+    select 1
+    from information_schema.table_constraints tc
+    where tc.table_schema = 'public'
+      and tc.table_name = 'contest_subject_topics'
+      and tc.constraint_type = 'UNIQUE'
+      and (
+        select array_agg(kcu.column_name::text order by kcu.ordinal_position)
+        from information_schema.key_column_usage kcu
+        where kcu.constraint_schema = tc.constraint_schema
+          and kcu.constraint_name = tc.constraint_name
+          and kcu.table_schema = tc.table_schema
+          and kcu.table_name = tc.table_name
+      ) = array['contest_subject_id', 'name']::text[]
+  ) then
+    create unique index contest_subject_topics_sid_name_uidx
+      on public.contest_subject_topics (contest_subject_id, name);
+  end if;
+exception
+  when unique_violation then
+    raise notice 'contest_subjects/topics: ha linhas duplicadas; remova duplicatas antes de criar indice unico.';
+  when duplicate_object then
+    null;
+end
+$migration$;
+
 create index if not exists contest_subjects_contest_idx
   on public.contest_subjects (contest_id, display_order, weight desc, name);
 

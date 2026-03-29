@@ -155,11 +155,13 @@ export async function resolveAuthenticatedUser(
     },
   });
 
-  console.log(`[${logContext}] auth.getUser() — iniciando`);
+  const accessTokenJwt = bearerHeader.replace(/^Bearer\s+/i, "").trim();
+
+  console.log(`[${logContext}] auth.getUser(jwt) — iniciando`, { jwtLength: accessTokenJwt.length });
   const {
     data: { user },
     error: userError,
-  } = await supabaseUser.auth.getUser();
+  } = await supabaseUser.auth.getUser(accessTokenJwt);
 
   if (userError) {
     console.error(`[${logContext}] auth.getUser() — erro`, {

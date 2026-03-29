@@ -1,5 +1,15 @@
 export const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "";
 
+/**
+ * IDs de preço Stripe para checkout (mesmos valores de BILLING_PLANS; starter = Yara Inicial).
+ */
+export const PRICE_MAP = {
+  pro_monthly: "price_1TGG3CBBsAS1lAp12hzsTwcu",
+  pro_yearly: "price_1TGGGtBBsAS1lAp1j6wF62D9",
+  starter_monthly: "price_1TGG1XBBsAS1lAp1UGeMhyj0",
+  starter_yearly: "price_1TGGHuBBsAS1lAp14HcpcTHS",
+};
+
 export const BILLING_STATUS_LABELS = {
   inactive: "inativa",
   checkout_pending: "checkout pendente",
@@ -20,12 +30,12 @@ export const BILLING_PLANS = {
     subtitle: "O essencial para estudar com direção e continuidade.",
     prices: {
       monthly: {
-        priceId: "price_1TGG1XBBsAS1lAp1UGeMhyj0",
+        priceId: PRICE_MAP.starter_monthly,
         amountLabel: "R$ 9,90",
         cadenceLabel: "/mês",
       },
       yearly: {
-        priceId: "price_1TGGHuBBsAS1lAp14HcpcTHS",
+        priceId: PRICE_MAP.starter_yearly,
         amountLabel: "R$ 99,00",
         cadenceLabel: "/ano",
       },
@@ -42,12 +52,12 @@ export const BILLING_PLANS = {
     subtitle: "Mais profundidade, mais autonomia e gestão completa da evolução.",
     prices: {
       monthly: {
-        priceId: "price_1TGG3CBBsAS1lAp12hzsTwcu",
+        priceId: PRICE_MAP.pro_monthly,
         amountLabel: "R$ 29,90",
         cadenceLabel: "/mês",
       },
       yearly: {
-        priceId: "price_1TGGGtBBsAS1lAp1j6wF62D9",
+        priceId: PRICE_MAP.pro_yearly,
         amountLabel: "R$ 297,00",
         cadenceLabel: "/ano",
       },

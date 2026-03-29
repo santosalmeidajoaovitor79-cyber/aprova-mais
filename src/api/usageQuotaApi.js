@@ -6,9 +6,20 @@ async function readRpcSingle(promise, fallbackMessage) {
   return data;
 }
 
+/** Data local (YYYY-MM-DD) para bater com `date_key` / `current_date` no Postgres. */
+function todayLocalISODate() {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
 export async function fetchDailyUsage(supabase) {
+  // PostgREST não casa `.rpc("get_my_daily_usage")` sem corpo com `get_my_daily_usage(date)`;
+  // é preciso passar o parâmetro nomeado (evita PGRST202).
   return readRpcSingle(
-    supabase.rpc("get_my_daily_usage"),
+    supabase.rpc("get_my_daily_usage", { target_date: todayLocalISODate() }),
     "Não foi possível carregar seu uso diário."
   );
 }

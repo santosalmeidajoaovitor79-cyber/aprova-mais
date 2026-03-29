@@ -6,6 +6,7 @@ import {
   createStripeClient,
   createSupabaseAdminClient,
   extractSubscriptionItemPriceId,
+  formatStripeOrUnknownError,
   getSubscriptionByStripeSubscriptionId,
   mapPriceToPlan,
   normalizeStripeSubscriptionStatus,
@@ -190,7 +191,7 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error(`[${LOG_CTX}] erro no webhook`, error);
     return billingError("Falha ao processar webhook Stripe.", "STRIPE_WEBHOOK_FAILED", 500, {
-      message: error instanceof Error ? error.message : String(error),
+      message: formatStripeOrUnknownError(error),
     });
   }
 });
