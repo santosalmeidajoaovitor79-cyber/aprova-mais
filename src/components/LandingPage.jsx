@@ -35,13 +35,6 @@ const featureCards = [
   },
 ];
 
-const yaraPoints = [
-  "Organiza seu próximo passo com base no seu momento",
-  "Explica de forma mais curta, profunda ou prática",
-  "Antecipa erros e confusões antes das questões",
-  "Te ajuda a voltar sem recomeçar tudo do zero",
-];
-
 const flowSteps = [
   "Escolha sua prova",
   "Entre na matéria certa",
@@ -90,11 +83,11 @@ function LandingPageComponent({ onStartRegister, onStartLogin, warpActive = fals
             YARA GUIA SEU ESTUDO EM TEMPO REAL
           </span>
 
-          <h1 className="aprova-reveal-1">Passe com uma IA que guia seu estudo de verdade.</h1>
+          <h1 className="aprova-reveal-1">Você não está estudando errado. Só está estudando sem direção.</h1>
 
           <p className="aprova-reveal-2">
-            A Yara organiza seu foco, explica do seu jeito, antecipa erros e te conduz com mais
-            clareza até a prova.
+            A maioria das pessoas se perde porque não sabe o que fazer depois de abrir o material.
+            A Yara lê o seu momento e te guia passo a passo até a prova, com clareza.
           </p>
 
           <div className="aprova-landing-pill-row aprova-reveal-3">
@@ -107,7 +100,7 @@ function LandingPageComponent({ onStartRegister, onStartLogin, warpActive = fals
 
           <div className="aprova-landing-cta-row aprova-reveal-4">
             <button className="aprova-btn-interactive aprova-landing-primary" onClick={onStartRegister} type="button">
-              Criar conta e começar
+              Começar com a Yara agora
               <ArrowRight size={18} />
             </button>
 
@@ -117,11 +110,8 @@ function LandingPageComponent({ onStartRegister, onStartLogin, warpActive = fals
           </div>
 
           <div className="aprova-landing-mini-proof aprova-reveal-5">
-            <strong>Você não precisa mais estudar tentando adivinhar o que fazer agora.</strong>
-            <span>
-              A Yara lê seu momento e te devolve direção. Quando você trava, ela simplifica.
-              Quando você avança, ela acelera.
-            </span>
+            <strong>foco • + clareza • menos tempo perdido</strong>
+            <span>A sensação muda quando alguém organiza o caminho em vez de te deixar se virar sozinho.</span>
           </div>
         </div>
 
@@ -150,26 +140,25 @@ function LandingPageComponent({ onStartRegister, onStartLogin, warpActive = fals
       <section className="aprova-landing-section">
         <div className="aprova-section-heading">
           <span>Por que o Aprova+ existe</span>
-          <h2>Estudar não costuma falhar por falta de conteúdo.</h2>
+          <h2>O problema não é falta de conteúdo.</h2>
           <p>
-            Falha porque o aluno perde direção, mistura prioridade com urgência e acaba estudando
-            muito sem sentir progresso real.
+            Você abre o material, lê, tenta entender... mas não sabe se aquilo é importante, se já
+            pode ir para questões ou se está pulando etapas.
           </p>
         </div>
 
         <div className="aprova-problem-strip">
           <div className="aprova-problem-strip-card">
-            <strong>O problema não é só ter matéria demais.</strong>
+            <strong>Falta saber o que fazer depois.</strong>
             <p>
-              É não saber o que fazer agora, o que insistir, o que revisar e como voltar quando o
-              ritmo quebra.
+              Você estuda, mas não tem clareza se deve insistir, revisar, praticar ou seguir para o
+              próximo ponto.
             </p>
           </div>
           <div className="aprova-problem-strip-card">
-            <strong>A ansiedade cresce quando falta direção.</strong>
+            <strong>No fim, sobra esforço. Não avanço.</strong>
             <p>
-              A sensação vira esforço espalhado: muito estudo, pouca clareza e quase nenhuma
-              continuidade.
+              No final do dia, fica a sensação de esforço, mas não de avanço.
             </p>
           </div>
         </div>
@@ -188,28 +177,38 @@ function LandingPageComponent({ onStartRegister, onStartLogin, warpActive = fals
       <section className="aprova-landing-section aprova-yara-section">
         <div className="aprova-yara-copy">
           <span>O que a Yara faz por você</span>
-          <h2>A Yara não é só um chat.</h2>
+          <h2>A Yara organiza seu estudo por você.</h2>
           <p>
-            Ela entende seu momento, reorganiza seu foco, ajusta a explicação e te ajuda a seguir
-            sem se perder no meio do caminho.
+            Ela entende o que você está estudando, identifica onde você pode errar e decide o
+            próximo passo certo.
           </p>
 
           <ul className="aprova-yara-list">
-            {yaraPoints.map((point) => (
-              <li key={point}>
-                <CheckCircle2 size={18} />
-                {point}
-              </li>
-            ))}
+            <li>
+              <CheckCircle2 size={18} />
+              Se você precisa entender, ela explica
+            </li>
+            <li>
+              <CheckCircle2 size={18} />
+              Se precisa praticar, ela te leva para questões
+            </li>
+            <li>
+              <CheckCircle2 size={18} />
+              Se errou, ela te faz revisar do jeito certo
+            </li>
+            <li>
+              <CheckCircle2 size={18} />
+              Sem achismo. Sem perder tempo.
+            </li>
           </ul>
         </div>
 
         <div className="aprova-yara-panel">
           <div className="aprova-yara-panel-card">
             <span className="aprova-yara-mini-kicker">Leitura do momento</span>
-            <h3>Quando você trava, ela simplifica. Quando você avança, ela acelera.</h3>
+            <h3>Ela lê seu momento e devolve direção.</h3>
             <p>
-              A sensação muda: menos esforço espalhado, mais progresso que faz sentido. Seu estudo
+              Quando você trava, ela simplifica. Quando você avança, ela acelera. Seu estudo
               continua do ponto certo, sem você precisar se remontar toda vez.
             </p>
           </div>
@@ -219,10 +218,10 @@ function LandingPageComponent({ onStartRegister, onStartLogin, warpActive = fals
       <section className="aprova-landing-section">
         <div className="aprova-section-heading">
           <span>Como o estudo acontece</span>
-          <h2>Do primeiro tópico ao dia da prova.</h2>
+          <h2>Do começo até a prova, com lógica.</h2>
           <p>
-            Concurso, matéria, explicação, questões, revisão e retomada — tudo conectado em uma
-            jornada que realmente faz sentido.
+            Você entra sem saber por onde começar. Sai sabendo exatamente o que estudar, o que
+            revisar e quando praticar.
           </p>
         </div>
 
@@ -239,10 +238,9 @@ function LandingPageComponent({ onStartRegister, onStartLogin, warpActive = fals
       <section className="aprova-landing-section aprova-difference-section">
         <div className="aprova-section-heading">
           <span>Por que estudar assim é diferente</span>
-          <h2>Menos bagunça. Mais clareza. Mais constância.</h2>
+          <h2>Não é mais um app de estudo.</h2>
           <p>
-            Menos sensação de estudar sozinho. Menos travamento. Mais acompanhamento real para você
-            sentir o estudo andar.
+            Menos bagunça. Mais clareza. Mais constância. Menos sensação de estudar sozinho.
           </p>
         </div>
 
@@ -258,10 +256,10 @@ function LandingPageComponent({ onStartRegister, onStartLogin, warpActive = fals
       </section>
 
       <section className="aprova-landing-final">
-        <span className="aprova-landing-final-kicker">Seu plano pode começar agora</span>
-        <h2>Entre no Aprova+ e deixe a Yara montar um começo mais claro, mais leve e muito mais inteligente.</h2>
+        <span className="aprova-landing-final-kicker">Se você quer parar de estudar no escuro...</span>
+        <h2>...e começar a estudar com direção real, esse é o momento.</h2>
         <button className="aprova-btn-interactive aprova-landing-primary" onClick={onStartRegister} type="button">
-          Começar com a Yara
+          Criar conta e começar certo
           <ArrowRight size={18} />
         </button>
       </section>
