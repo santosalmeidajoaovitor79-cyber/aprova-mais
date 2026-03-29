@@ -10,6 +10,7 @@ import {
   Target,
   Wand2,
 } from "lucide-react";
+import { PricingSection } from "./PricingSection.jsx";
 
 const trustPills = [
   "Plano com direção real",
@@ -254,6 +255,8 @@ function LandingPageComponent({ onStartRegister, onStartLogin, warpActive = fals
           ))}
         </div>
       </section>
+
+      <PricingSection onRequireAuth={() => onStartRegister?.()} onLogin={onStartLogin} />
 
       <section className="aprova-landing-final">
         <span className="aprova-landing-final-kicker">Se você quer parar de estudar no escuro...</span>

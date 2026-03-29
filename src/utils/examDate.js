@@ -272,7 +272,7 @@ export function normalizeLearnerMetrics(raw) {
 /**
  * Contexto completo para Edge Functions: prova + catálogo + progresso do aluno.
  * @param {Record<string, unknown> | null | undefined} [learnerMetricsRaw]
- * @param {{ flowMoment?: "explanation" | "chat" | "pre_questions" | "post_explanation", studySessionContext?: Record<string, unknown> | null, learningFeedback?: Record<string, unknown> | null }} [options]
+ * @param {{ flowMoment?: "explanation" | "chat" | "pre_questions" | "post_explanation", studySessionContext?: Record<string, unknown> | null, learningFeedback?: Record<string, unknown> | null, contestTree?: Record<string, unknown> | null }} [options]
  */
 export function buildFullAiPayload(examDateStr, contest, subject, topic, learnerMetricsRaw, options) {
   const base = buildExamContextPayload(examDateStr);
@@ -351,8 +351,16 @@ export function buildFullAiPayload(examDateStr, contest, subject, topic, learner
       contestName,
       subjectName,
       topicName,
+      ...(contest?.source_catalog_id ? { contestCatalogId: contest.source_catalog_id } : {}),
+      ...(subject?.weight != null ? { subjectWeight: Number(subject.weight) } : {}),
+      ...(subject?.display_order != null ? { subjectDisplayOrder: Number(subject.display_order) } : {}),
+      ...(topic?.weight != null ? { topicWeight: Number(topic.weight) } : {}),
+      ...(topic?.display_order != null ? { topicDisplayOrder: Number(topic.display_order) } : {}),
       ...(topicId ? { topicId } : {}),
     };
+  }
+  if (options?.contestTree && typeof options.contestTree === "object") {
+    out.contestTree = options.contestTree;
   }
   if (learnerContext) {
     out.learnerContext = learnerContext;

@@ -1,5 +1,53 @@
 export async function fetchContests(supabase) {
-  return supabase.from("contests").select("id, name, slug, owner_user_id").order("name");
+  return supabase
+    .from("contests")
+    .select("id, name, slug, owner_user_id, source_catalog_id")
+    .order("name");
+}
+
+export async function fetchContestsCatalog(supabase) {
+  return supabase.rpc("public_contests_catalog");
+}
+
+export async function searchContests(supabase, query) {
+  const trimmed = query?.trim();
+  if (!trimmed) {
+    return { data: [], error: null };
+  }
+
+  return supabase.rpc("search_public_contests_catalog", { search_query: trimmed });
+}
+
+export async function getSuggestedContests(supabase, area) {
+  const normalizedArea = typeof area === "string" ? area.trim().toLowerCase() : "";
+  const response = await supabase.rpc("get_suggested_public_contests", {
+    target_area: normalizedArea || "geral",
+  });
+  if (response.error || (response.data?.length ?? 0) > 0 || !normalizedArea || normalizedArea === "geral") {
+    return response;
+  }
+
+  return supabase.rpc("get_suggested_public_contests", { target_area: "geral" });
+}
+
+export async function fetchPublicContestCatalogTree(supabase, contestCatalogId) {
+  return supabase.rpc("public_contest_catalog_tree", { target_catalog_id: contestCatalogId });
+}
+
+export async function ensureRuntimeContestFromCatalog(supabase, contestCatalogId) {
+  const { data: runtimeContestId, error } = await supabase.rpc("sync_runtime_contest_from_catalog", {
+    target_catalog_id: contestCatalogId,
+  });
+
+  if (error || !runtimeContestId) {
+    return { data: null, error: error || new Error("Nao foi possivel preparar esse concurso.") };
+  }
+
+  return supabase
+    .from("contests")
+    .select("id, name, slug, owner_user_id, source_catalog_id")
+    .eq("id", runtimeContestId)
+    .maybeSingle();
 }
 
 function buildAuthRequiredError(message) {
@@ -77,7 +125,7 @@ export async function createSubject(supabase, { contestId, name }) {
   return supabase
     .from("subjects")
     .insert({ contest_id: contestId, name: name.trim() })
-    .select("id, name")
+    .select("id, name, weight, display_order, source_catalog_subject_id")
     .maybeSingle();
 }
 
@@ -89,22 +137,26 @@ export async function createTopic(supabase, { subjectId, name, description }) {
       name: name.trim(),
       description: description?.trim() || null,
     })
-    .select("id, name, description, difficulty, estimated_minutes")
+    .select("id, name, description, difficulty, estimated_minutes, weight, display_order, source_catalog_topic_id")
     .maybeSingle();
 }
 
 export async function fetchSubjectsByContest(supabase, contestId) {
   return supabase
     .from("subjects")
-    .select("id, name")
+    .select("id, name, weight, display_order, source_catalog_subject_id")
     .eq("contest_id", contestId)
-    .order("name");
+    .order("display_order", { ascending: true })
+    .order("weight", { ascending: false })
+    .order("name", { ascending: true });
 }
 
 export async function fetchTopicsBySubject(supabase, subjectId) {
   return supabase
     .from("topics")
-    .select("id, name, description, difficulty, estimated_minutes")
+    .select("id, name, description, difficulty, estimated_minutes, weight, display_order, source_catalog_topic_id")
     .eq("subject_id", subjectId)
-    .order("name");
+    .order("display_order", { ascending: true })
+    .order("weight", { ascending: false })
+    .order("name", { ascending: true });
 }

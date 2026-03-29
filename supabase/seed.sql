@@ -46,3 +46,12 @@ cross join (values
 ) as t(cslug, subj, name, description, difficulty, minutes)
 where c.slug = t.cslug and sub.name = t.subj
 on conflict (subject_id, name) do nothing;
+
+-- Catalogo editorial para onboarding e painel admin
+select public.seed_contests_catalog();
+select public.seed_launch_contest_tree();
+select public.sync_all_runtime_contests_from_catalog();
+
+-- Primeiro admin: execute manualmente no SQL Editor apos a migration, trocando pelo seu email real.
+-- insert into public.admin_users (email) values ('seu-email@dominio.com')
+-- on conflict do nothing;

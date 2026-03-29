@@ -7,6 +7,9 @@ import { shouldShowContestColumn } from "../utils/studyContestUi.js";
 import { ChatMessageBubble, YARA_NAME, YARA_ROLE_LABEL } from "./ChatMessageBubble.jsx";
 import { ReviewErrorsScreen } from "./ReviewErrorsScreen.jsx";
 import { StudyWelcomeShell } from "./StudyWelcomeShell.jsx";
+import { PremiumFeatureCard } from "./PremiumFeatureCard.jsx";
+import { UpgradeInlineNotice } from "./UpgradeInlineNotice.jsx";
+import { UsageLimitNotice } from "./UsageLimitNotice.jsx";
 import {
   isMissionFullyDone,
   isMissionStepDone,
@@ -71,12 +74,25 @@ function StudyTopicSidebar({
   onReviewErrors,
   onDoQuestions,
   examReadiness = null,
+  featureAccess = null,
+  onUpgradeToPro,
 }) {
+  const premiumInsightsLocked = Boolean(featureAccess && !featureAccess.canUsePremiumInsights);
+  const premiumCopy = featureAccess?.getUpgradeCopy?.("premiumInsights");
+
   return (
     <div className="aprova-study-topic-side-inner">
       <div className="aprova-study-topic-side-block" aria-live="polite">
         <span className="aprova-study-topic-side-kicker">Yara · contexto</span>
-        {examReadiness && hasMainExamForInsights && !studyInsightsLoading ? (
+        {premiumInsightsLocked && premiumCopy ? (
+          <UpgradeInlineNotice
+            title={premiumCopy.title}
+            description={premiumCopy.description}
+            ctaLabel={premiumCopy.cta}
+            onUpgrade={onUpgradeToPro}
+          />
+        ) : null}
+        {examReadiness && hasMainExamForInsights && !studyInsightsLoading && !premiumInsightsLocked ? (
           <ExamReadinessStrip readiness={examReadiness} compact />
         ) : null}
         {studyInsightsError ? (
@@ -92,7 +108,11 @@ function StudyTopicSidebar({
             Atualizando análise de erros…
           </p>
         ) : null}
-        {!studyInsightsError && hasMainExamForInsights && !studyInsightsLoading && studyRecommendation ? (
+        {!studyInsightsError &&
+        hasMainExamForInsights &&
+        !studyInsightsLoading &&
+        studyRecommendation &&
+        !premiumInsightsLocked ? (
           <>
             <p className="aprova-study-topic-side-reco">{studyRecommendation.message}</p>
             {studyInsightTopicCount > 0 ? (
@@ -132,7 +152,7 @@ function StudyTopicSidebar({
         ) : null}
       </div>
 
-      {studyMission && hasMainExamForInsights && !studyInsightsLoading ? (
+      {studyMission && hasMainExamForInsights && !studyInsightsLoading && !premiumInsightsLocked ? (
         <div className="aprova-study-topic-side-block aprova-study-topic-side-block--mission">
           <span className="aprova-study-topic-side-kicker">Missão do dia</span>
           <p className="aprova-study-topic-side-mission-title">Foco: {studyMission.topic_name}</p>
@@ -257,11 +277,17 @@ function TopicStudyWorkspace({
   contextAside = null,
   yaraActionFeedback = null,
   yaraMiniSessionUi = null,
+  featureAccess = null,
+  usageQuota = null,
+  onUpgradeToPro,
 }) {
   const [studyViewTab, setStudyViewTab] = useState(() =>
     workspaceTabHint === "questions" ? "questions" : "explanation"
   );
   const chatBusy = chatSending || chatHistoryClearing;
+  const chatLocked = Boolean(featureAccess && !featureAccess.canUseYaraChat);
+  const chatUpgradeCopy = featureAccess?.getUpgradeCopy?.("yaraChat");
+  const remainingChat = featureAccess?.getRemainingChatQuota?.();
   const focusStreamlined = Boolean(workspaceSplitDisabled);
   const resolvedStudyViewTab = studyViewTab === "chat" ? "explanation" : studyViewTab;
 
@@ -381,6 +407,9 @@ function TopicStudyWorkspace({
         onStartRecoveryTraining={onStartRecoveryTraining}
         simuladoMeta={simuladoMeta}
         simuladoResult={simuladoResult}
+        featureAccess={featureAccess}
+        usageQuota={usageQuota?.usage ?? null}
+        onUpgradeToPro={onUpgradeToPro}
       />
     </div>
   );
@@ -434,9 +463,9 @@ function TopicStudyWorkspace({
         className="aprova-btn-interactive"
         style={{
           ...styles.quickActionButton,
-          ...(chatBusy ? styles.quickActionButtonDisabled : {}),
+          ...(chatBusy || chatLocked ? styles.quickActionButtonDisabled : {}),
         }}
-        disabled={chatBusy}
+        disabled={chatBusy || chatLocked}
         onClick={() =>
           onSendChatPrompt(
             "Explique este conteúdo de forma mais clara e didática, aprofundando os pontos principais."
@@ -450,9 +479,9 @@ function TopicStudyWorkspace({
         className="aprova-btn-interactive"
         style={{
           ...styles.quickActionButton,
-          ...(chatBusy ? styles.quickActionButtonDisabled : {}),
+          ...(chatBusy || chatLocked ? styles.quickActionButtonDisabled : {}),
         }}
-        disabled={chatBusy}
+        disabled={chatBusy || chatLocked}
         onClick={() => onSendChatPrompt("Dê um exemplo prático e simples sobre este conteúdo.")}
       >
         Dar exemplo
@@ -462,9 +491,9 @@ function TopicStudyWorkspace({
         className="aprova-btn-interactive"
         style={{
           ...styles.quickActionButton,
-          ...(chatBusy ? styles.quickActionButtonDisabled : {}),
+          ...(chatBusy || chatLocked ? styles.quickActionButtonDisabled : {}),
         }}
-        disabled={chatBusy}
+        disabled={chatBusy || chatLocked}
         onClick={() =>
           onSendChatPrompt(
             "Como esse tema costuma cair em provas de concurso? Descreva padrões de cobrança comuns, sem inventar edições ou provas específicas."
@@ -595,25 +624,40 @@ function TopicStudyWorkspace({
 
   const chatInputFooter = (
     <div className="aprova-chat-input-outer">
+      {chatLocked && chatUpgradeCopy ? (
+        <UsageLimitNotice
+          title={chatUpgradeCopy.title}
+          description={chatUpgradeCopy.description}
+          remaining={remainingChat}
+          ctaLabel={chatUpgradeCopy.cta}
+          onUpgrade={onUpgradeToPro}
+        />
+      ) : remainingChat != null ? (
+        <p className="aprova-usage-limit-notice__meta">
+          Hoje restam <strong>{remainingChat}</strong> conversa{remainingChat !== 1 ? "s" : ""} com a Yara neste plano.
+        </p>
+      ) : usageQuota?.error ? (
+        <p className="aprova-usage-limit-notice__meta">{usageQuota.error}</p>
+      ) : null}
       <div className="aprova-chat-input-box">
         <textarea
           value={chatInput}
           onChange={(e) => setChatInput(e.target.value)}
           className="aprova-chat-textarea"
           rows={1}
-          disabled={chatBusy}
+          disabled={chatBusy || chatLocked}
           placeholder={`Pergunte à ${YARA_NAME} ou peça um resumo…`}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
-              onSendChat();
+              if (!chatLocked) onSendChat();
             }
           }}
         />
         <button
           type="button"
           onClick={onSendChat}
-          disabled={chatBusy}
+          disabled={chatBusy || chatLocked}
           className="aprova-chat-send-btn-icon"
           aria-label={chatBusy ? "Aguarde…" : "Enviar mensagem"}
         >
@@ -892,6 +936,9 @@ function StudyAreaPanelComponent({
   yaraActionFeedback = null,
   yaraMiniSessionUi = null,
   examReadiness = null,
+  featureAccess = null,
+  usageQuota = null,
+  onUpgradeToPro,
 }) {
   const studyTopicAnchorRef = useRef(null);
   const manualSelectorRef = useRef(null);
@@ -1119,6 +1166,8 @@ function StudyAreaPanelComponent({
         onReviewErrors={onReviewErrors}
         onDoQuestions={onDoQuestions}
         examReadiness={examReadiness}
+        featureAccess={featureAccess}
+        onUpgradeToPro={onUpgradeToPro}
       />
     ) : null;
 
@@ -1184,7 +1233,8 @@ function StudyAreaPanelComponent({
           {!studyInsightsError &&
           hasMainExamForInsights &&
           !studyInsightsLoading &&
-          studyRecommendation ? (
+          studyRecommendation &&
+          featureAccess?.canUsePremiumInsights !== false ? (
             <div
               className={`aprova-ai-recommendation-card aprova-ai-recommendation-card--${studyRecommendation.type}`}
             >
@@ -1223,7 +1273,8 @@ function StudyAreaPanelComponent({
           {!studyInsightsError &&
           hasMainExamForInsights &&
           !studyInsightsLoading &&
-          !studyRecommendation ? (
+          !studyRecommendation &&
+          featureAccess?.canUsePremiumInsights !== false ? (
             <div className="aprova-ai-recommendation-card aprova-ai-recommendation-card--neutral" role="status">
               <span className="aprova-ai-recommendation-kicker">Yara</span>
               <p className="aprova-ai-recommendation-text">
@@ -1232,9 +1283,28 @@ function StudyAreaPanelComponent({
               </p>
             </div>
           ) : null}
+
+          {!studyInsightsError &&
+          hasMainExamForInsights &&
+          !studyInsightsLoading &&
+          featureAccess &&
+          !featureAccess.canUsePremiumInsights ? (
+            <PremiumFeatureCard
+              compact
+              title="As prioridades inteligentes da Yara ficam no Pro."
+              description="Continue estudando normalmente e ative o Yara Pro quando quiser recomendações mais profundas e diagnósticos mais refinados."
+              bullets={[
+                "Prioridade guiada por erros e retomadas",
+                "Leitura mais profunda do momento",
+                "Recomendações premium no dashboard",
+              ]}
+              ctaLabel="Liberar Yara Pro"
+              onUpgrade={onUpgradeToPro}
+            />
+          ) : null}
         </div>
 
-        {studyMission && hasMainExamForInsights && !studyInsightsLoading ? (
+        {studyMission && hasMainExamForInsights && !studyInsightsLoading && featureAccess?.canUsePremiumInsights !== false ? (
           <div className="aprova-study-mission-card" aria-labelledby="aprova-study-mission-title">
             <span className="aprova-study-mission-kicker">Missão do dia</span>
             <h3 id="aprova-study-mission-title" className="aprova-study-mission-title">
@@ -1472,6 +1542,8 @@ function StudyAreaPanelComponent({
             examReadiness={examReadiness}
             simuladoBusy={Boolean(questionsLoading && adaptiveSimuladoMeta)}
             onStartAdaptiveSimulado={onStartAdaptiveSimulado}
+            featureAccess={featureAccess}
+            onUpgradeToPro={onUpgradeToPro}
           />
         </>
       ) : (
@@ -1548,6 +1620,9 @@ function StudyAreaPanelComponent({
           contextAside={topicStudyContextAside}
           yaraActionFeedback={yaraActionFeedback}
           yaraMiniSessionUi={yaraMiniSessionUi}
+          featureAccess={featureAccess}
+          usageQuota={usageQuota}
+          onUpgradeToPro={onUpgradeToPro}
         />
       ) : null}
         </section>

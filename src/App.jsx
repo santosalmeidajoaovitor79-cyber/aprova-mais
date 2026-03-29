@@ -15,8 +15,12 @@ import { StudyAreaPanel } from "./components/StudyAreaPanel.jsx";
 import { useAccountProfile } from "./hooks/useAccountProfile.js";
 import { useAuthSession } from "./hooks/useAuthSession.js";
 import { useDashboardStudy } from "./hooks/useDashboardStudy.js";
+import { useFeatureAccess } from "./hooks/useFeatureAccess.js";
 import { useLearnerMemoryForAi } from "./hooks/useLearnerMemoryForAi.js";
+import { useSubscription } from "./hooks/useSubscription.js";
 import { useStudyArea } from "./hooks/useStudyArea.js";
+import { useUsageQuota } from "./hooks/useUsageQuota.js";
+import { AdminContestsPage } from "./pages/AdminContestsPage.jsx";
 import * as activityApi from "./api/studyActivityApi.js";
 import { supabase } from "./lib/supabaseClient.js";
 import { styles } from "./styles/appStyles.js";
@@ -71,6 +75,7 @@ function App() {
   const [transitionActive, setTransitionActive] = useState(false);
   const [pendingAuthMode, setPendingAuthMode] = useState(null);
   const [authVisible, setAuthVisible] = useState(false);
+  const [pathname, setPathname] = useState(() => window.location.pathname || "/");
   const transitionLockRef = useRef(false);
   const transitionTimersRef = useRef([]);
 
@@ -80,6 +85,20 @@ function App() {
   }, []);
 
   useEffect(() => () => clearAuthTransitionTimers(), [clearAuthTransitionTimers]);
+
+  useEffect(() => {
+    const handlePopState = () => setPathname(window.location.pathname || "/");
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("tab") === "profile") {
+      setMainTab("profile");
+      window.history.replaceState({}, "", window.location.pathname || "/");
+    }
+  }, []);
 
   useEffect(
     () => () => {
@@ -140,11 +159,22 @@ function App() {
     setPreAuthPhase("landing");
   }, [clearAuthTransitionTimers]);
 
+  const navigateToPath = useCallback((nextPath) => {
+    const resolvedPath = nextPath?.trim() || "/";
+    if (window.location.pathname !== resolvedPath) {
+      window.history.pushState({}, "", resolvedPath);
+      setPathname(resolvedPath);
+    }
+  }, []);
+
   const setErrorStable = useCallback((msg) => setError(msg), []);
 
   const { session, loading } = useAuthSession(setErrorStable);
 
   const profile = useAccountProfile(supabase, setErrorStable);
+  const subscription = useSubscription(supabase, session);
+  const usageQuota = useUsageQuota(supabase, session, subscription.access);
+  const featureAccess = useFeatureAccess(subscription.access, usageQuota.usage);
 
   const mainExamIdForDash = profile.mainExamId?.trim() || null;
   const pinnedContestId =
@@ -287,6 +317,17 @@ function App() {
     [bumpStudyInsightsRefresh, onQuestionRevealedForMission]
   );
 
+  const handleUpgradeToPro = useCallback(() => {
+    if (subscription.access?.isPro) {
+      void subscription.openBillingPortal?.();
+      return;
+    }
+    void subscription.startCheckout?.({
+      planKey: "pro",
+      billingCycle: featureAccess.recommendedUpgrade?.billingCycle || "monthly",
+    });
+  }, [featureAccess.recommendedUpgrade?.billingCycle, subscription]);
+
   const study = useStudyArea(
     supabase,
     session,
@@ -306,6 +347,10 @@ function App() {
       onAdaptiveSimuladoComplete: () => {
         setSimuladoReadinessTick((n) => n + 1);
       },
+      featureAccess,
+      consumeChatQuota: usageQuota.consumeChatQuota,
+      consumeQuestionQuota: usageQuota.consumeQuestionQuota,
+      consumeRecoverySession: usageQuota.consumeRecoverySession,
     }
   );
 
@@ -1221,12 +1266,22 @@ function App() {
       addSubjectToContest: study.addSubjectToContest,
       addTopicToSubject: study.addTopicToSubject,
       reloadContests: study.reloadContests,
+      fetchContestsCatalog: study.fetchContestsCatalog,
+      searchContests: study.searchContests,
+      getSuggestedContests: study.getSuggestedContests,
+      fetchPublicContestCatalogTree: study.fetchPublicContestCatalogTree,
+      ensureRuntimeContestFromCatalog: study.ensureRuntimeContestFromCatalog,
     }),
     [
       study.createUserContest,
       study.addSubjectToContest,
       study.addTopicToSubject,
       study.reloadContests,
+      study.fetchContestsCatalog,
+      study.searchContests,
+      study.getSuggestedContests,
+      study.fetchPublicContestCatalogTree,
+      study.ensureRuntimeContestFromCatalog,
     ]
   );
 
@@ -1248,6 +1303,7 @@ function App() {
   }, []);
 
   const showShellLoading = loading || (Boolean(session?.user?.id) && !navHydrated);
+  const isAdminRoute = pathname === "/admin/contests";
 
   if (showShellLoading) {
     return (
@@ -1337,11 +1393,25 @@ function App() {
         studyFocusMode={studyFocusMode && mainTab === "study"}
         onExitStudyFocus={() => setStudyFocusMode(false)}
       >
-        <AppMainNav activeTab={mainTab} onTabChange={setMainTab} />
+        {isAdminRoute ? (
+          <div className="aprova-admin-nav">
+            <button type="button" className="aprova-admin-nav-link" onClick={() => navigateToPath("/")}>
+              Voltar ao produto
+            </button>
+          </div>
+        ) : (
+          <AppMainNav activeTab={mainTab} onTabChange={setMainTab} />
+        )}
       </DashboardHeader>
 
       <main className="aprova-app-main">
-        {mainTab === "dashboard" ? (
+        {isAdminRoute ? (
+          <div className="aprova-main-tab-content aprova-view-stage">
+            <AdminContestsPage supabase={supabase} session={session} onBackToApp={() => navigateToPath("/")} />
+          </div>
+        ) : null}
+
+        {!isAdminRoute && mainTab === "dashboard" ? (
           <div
             key="view-dashboard"
             style={styles.mainTabContent}
@@ -1393,6 +1463,8 @@ function App() {
               onOpenStudyTab={handleOpenStudyBare}
               onMissionAction={handleMissionAction}
               onResumeAction={handleResumeJourneyAction}
+            featureAccess={featureAccess}
+            onUpgradeToPro={handleUpgradeToPro}
             />
           </div>
         ) : null}
@@ -1401,10 +1473,10 @@ function App() {
           className={mainTab === "study" ? "aprova-main-tab-content" : undefined}
           style={{
             ...styles.studyTabMain,
-            display: mainTab === "study" ? "block" : "none",
+            display: !isAdminRoute && mainTab === "study" ? "block" : "none",
             ...(mainTab === "study" ? styles.mainTabContent : {}),
           }}
-          aria-hidden={mainTab !== "study"}
+          aria-hidden={isAdminRoute || mainTab !== "study"}
         >
           {studyFocusMode && mainTab === "study" ? (
             <div
@@ -1528,11 +1600,14 @@ function App() {
             }
             yaraMiniSessionUi={study.yaraMiniSessionUi}
             examReadiness={examReadiness}
+            featureAccess={featureAccess}
+            usageQuota={usageQuota}
+            onUpgradeToPro={handleUpgradeToPro}
           />
           </div>
         </div>
 
-        {mainTab === "profile" ? (
+        {!isAdminRoute && mainTab === "profile" ? (
           <div
             key="view-profile"
             style={{ ...styles.profileTabWrap, ...styles.mainTabContent }}
@@ -1564,6 +1639,14 @@ function App() {
                   ? `Retomar “${lastTopicLabel.length > 36 ? `${lastTopicLabel.slice(0, 34)}…` : lastTopicLabel}”`
                   : dashboard.continueProgressLine || undefined
               }
+              subscription={subscription.subscription}
+              subscriptionAccess={subscription.access}
+              subscriptionLoading={subscription.loading}
+              checkoutBusy={subscription.checkoutBusy}
+              portalBusy={subscription.portalBusy}
+              subscriptionError={subscription.error}
+              onStartCheckout={subscription.startCheckout}
+              onManageSubscription={subscription.openBillingPortal}
             />
           </div>
         ) : null}

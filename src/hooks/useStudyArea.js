@@ -70,6 +70,10 @@ function normalizePendingSessionActionsFromResponse(raw) {
  *   onAssistantAction?: (action: { type: string, params?: Record<string, unknown> } | null) => void,
  *   onRequestWorkspaceSubTab?: (tab: "explanation" | "questions" | "chat") => void,
  *   onAdaptiveSimuladoComplete?: () => void,
+ *   featureAccess?: Record<string, unknown>,
+ *   consumeChatQuota?: (amount?: number) => Promise<{ allowed?: boolean, error?: string }>,
+ *   consumeQuestionQuota?: (amount?: number) => Promise<{ allowed?: boolean, error?: string }>,
+ *   consumeRecoverySession?: (amount?: number) => Promise<{ allowed?: boolean, error?: string }>,
  * }} [studyAreaOptions]
  */
 export function useStudyArea(
@@ -88,6 +92,10 @@ export function useStudyArea(
     onAssistantAction,
     onRequestWorkspaceSubTab,
     onAdaptiveSimuladoComplete,
+    featureAccess,
+    consumeChatQuota,
+    consumeQuestionQuota,
+    consumeRecoverySession,
   } = studyAreaOptions;
   const userId = session?.user?.id ?? null;
 
@@ -132,12 +140,33 @@ export function useStudyArea(
   const [recoveryFeedback, setRecoveryFeedback] = useState(null);
   const [studySubTab, setStudySubTab] = useState("explanation");
 
+  const contestTreeContext = useMemo(
+    () => ({
+      source: selectedContest?.source_catalog_id ? "contest_catalog" : "runtime_fallback",
+      contestCatalogId: selectedContest?.source_catalog_id ?? null,
+      subjects: subjectsList.slice(0, 12).map((subject) => ({
+        id: subject.id,
+        name: subject.name,
+        weight: subject.weight ?? null,
+        displayOrder: subject.display_order ?? null,
+      })),
+      currentSubjectTopics: topicsList.slice(0, 20).map((topic) => ({
+        id: topic.id,
+        name: topic.name,
+        weight: topic.weight ?? null,
+        displayOrder: topic.display_order ?? null,
+      })),
+    }),
+    [selectedContest?.source_catalog_id, subjectsList, topicsList]
+  );
+
   const aiPayload = useMemo(
     () =>
       buildFullAiPayload(examDate, selectedContest, selectedSubject, selectedTopic, learnerMetrics, {
         flowMoment: studySubTab === "questions" ? "pre_questions" : "chat",
         studySessionContext: studySessionState,
         learningFeedback,
+        contestTree: contestTreeContext,
       }),
     [
       examDate,
@@ -148,6 +177,7 @@ export function useStudyArea(
       studySubTab,
       studySessionState,
       learningFeedback,
+      contestTreeContext,
     ]
   );
   const predictedRisk = aiPayload?.predictedRisk ?? null;
@@ -482,6 +512,7 @@ export function useStudyArea(
     const payload = buildFullAiPayload(examDate, selectedContest, selectedSubject, topic, learnerMetrics, {
       flowMoment: "explanation",
       learningFeedback: learningFeedbackRef.current,
+      contestTree: contestTreeContext,
     });
     await loadTopicExperience(topic, selectedContest, selectedSubject, payload);
   }
@@ -579,6 +610,7 @@ export function useStudyArea(
       const payload = buildFullAiPayload(examDate, contest, subject, topic, learnerMetrics, {
         flowMoment: "explanation",
         learningFeedback: learningFeedbackRef.current,
+        contestTree: contestTreeContext,
       });
       await loadTopicExperience(topic, contest, subject, payload);
       const resumeJourney = buildStudyResumeJourney(snap);
@@ -875,6 +907,7 @@ export function useStudyArea(
     const topic = selectedTopicRef.current;
     const pendingSteps = studySessionPendingStepsRef.current;
     const shouldTrackStudySession = options.trackStudySession !== false;
+    const shouldConsumeQuota = options.skipQuota !== true;
     const detectedIntent = detectUserIntent(prompt);
     const nextStudySessionState = shouldTrackStudySession
       ? updateStudySessionState(
@@ -906,6 +939,7 @@ export function useStudyArea(
       flowMoment: resolveFlowMoment(studySessionContext),
       studySessionContext,
       learningFeedback: nextLearningFeedback,
+      contestTree: contestTreeContext,
     });
     const payload = { ...basePayload, studySessionContext, learningFeedback: nextLearningFeedback };
 
@@ -913,9 +947,18 @@ export function useStudyArea(
     setTopicFlowError("");
     setChatSending(true);
 
-    setTopicChatMessages((prev) => [...prev, { role: "user", content: prompt }]);
-
     try {
+      if (shouldConsumeQuota && featureAccess && !featureAccess.isPro && typeof consumeChatQuota === "function") {
+        const chatQuota = await consumeChatQuota(1);
+        if (!chatQuota?.allowed) {
+          throw new Error(
+            chatQuota?.error || "Você atingiu o limite do Yara Inicial para falar com a Yara hoje."
+          );
+        }
+      }
+
+      setTopicChatMessages((prev) => [...prev, { role: "user", content: prompt }]);
+
       const { data, error: fnErr } = await topicApi.invokeStudyChat(supabase, topicId, prompt, payload);
 
       if (fnErr) throw fnErr;
@@ -968,6 +1011,10 @@ export function useStudyArea(
       const uid = session?.user?.id;
       if (!contest?.id || !uid) {
         setQuestionsError("Selecione um concurso para rodar o mini simulado.");
+        return;
+      }
+      if (featureAccess && !featureAccess.canUseAdvancedSimulado) {
+        setQuestionsError("O mini simulado adaptativo faz parte do Yara Pro.");
         return;
       }
       const n = [5, 8, 10].includes(Number(totalQuestions)) ? Number(totalQuestions) : 8;
@@ -1055,6 +1102,7 @@ export function useStudyArea(
                 flowMoment: "pre_questions",
                 studySessionContext: studySessionStateRef.current,
                 learningFeedback: learningFeedbackRef.current,
+                contestTree: contestTreeContext,
               }
             );
             return topicApi.invokeGenerateTopicQuestions(supabase, chunk.topicId, payload, {
@@ -1100,6 +1148,10 @@ export function useStudyArea(
 
   async function generateTopicQuestions() {
     if (!selectedTopic?.id || !session?.user) return;
+    if (featureAccess && !featureAccess.canUseQuestions) {
+      setQuestionsError("Seu bloco básico de questões do Yara Inicial já foi usado hoje.");
+      return;
+    }
 
     setAdaptiveSimuladoMeta(null);
     setAdaptiveSimuladoResult(null);
@@ -1116,6 +1168,13 @@ export function useStudyArea(
     setQuizMistakeByKey({});
 
     try {
+      if (featureAccess && !featureAccess.isPro && typeof consumeQuestionQuota === "function") {
+        const quotaResult = await consumeQuestionQuota(3);
+        if (!quotaResult?.allowed) {
+          throw new Error(quotaResult?.error || "Seu bloco básico de questões do Yara Inicial já foi usado hoje.");
+        }
+      }
+
       const { data, error: fnErr } = await topicApi.invokeGenerateTopicQuestions(
         supabase,
         selectedTopic.id,
@@ -1140,6 +1199,10 @@ export function useStudyArea(
 
   async function startRecoveryTraining(questionKey) {
     if (!selectedTopic?.id || !session?.user) return;
+    if (featureAccess && !featureAccess.canUseBasicRecovery) {
+      setQuestionsError("A continuação da recuperação fica disponível no Yara Pro.");
+      return;
+    }
 
     setAdaptiveSimuladoMeta(null);
     setAdaptiveSimuladoResult(null);
@@ -1189,6 +1252,13 @@ export function useStudyArea(
     });
 
     try {
+      if (featureAccess && !featureAccess.isPro && typeof consumeRecoverySession === "function") {
+        const recoveryQuota = await consumeRecoverySession(1);
+        if (!recoveryQuota?.allowed) {
+          throw new Error(recoveryQuota?.error || "A continuação da recuperação fica disponível no Yara Pro.");
+        }
+      }
+
       const { data, error: fnErr } = await topicApi.invokeGenerateTopicQuestions(
         supabase,
         selectedTopic.id,
@@ -1298,6 +1368,7 @@ export function useStudyArea(
           flowMoment: studySubTab === "questions" ? "pre_questions" : "chat",
           studySessionContext: studySessionStateRef.current,
           learningFeedback: learningFeedbackRef.current,
+          contestTree: contestTreeContext,
         }
       );
 
@@ -1540,7 +1611,7 @@ export function useStudyArea(
       bestLabels,
       worstLabels,
     });
-    void sendTopicChatMessage(debriefPrompt, { trackStudySession: false });
+    void sendTopicChatMessage(debriefPrompt, { trackStudySession: false, skipQuota: true });
     // sendTopicChatMessage é estável na prática; omitido do array para evitar loop.
   }, [
     adaptiveSimuladoMeta,
@@ -1578,6 +1649,25 @@ export function useStudyArea(
     if (!error && data) setContests(data);
     return { data, error };
   }, [supabase]);
+
+  const fetchContestsCatalog = useCallback(() => catalogApi.fetchContestsCatalog(supabase), [supabase]);
+
+  const searchContests = useCallback((query) => catalogApi.searchContests(supabase, query), [supabase]);
+
+  const getSuggestedContests = useCallback(
+    (area) => catalogApi.getSuggestedContests(supabase, area),
+    [supabase]
+  );
+
+  const fetchPublicContestCatalogTree = useCallback(
+    (contestCatalogId) => catalogApi.fetchPublicContestCatalogTree(supabase, contestCatalogId),
+    [supabase]
+  );
+
+  const ensureRuntimeContestFromCatalog = useCallback(
+    (contestCatalogId) => catalogApi.ensureRuntimeContestFromCatalog(supabase, contestCatalogId),
+    [supabase]
+  );
 
   return {
     catalogError,
@@ -1625,6 +1715,11 @@ export function useStudyArea(
     addSubjectToContest,
     addTopicToSubject,
     reloadContests,
+    fetchContestsCatalog,
+    searchContests,
+    getSuggestedContests,
+    fetchPublicContestCatalogTree,
+    ensureRuntimeContestFromCatalog,
     openCatalogTopic,
     openTopicAndAskWhyStruggling,
     startAdaptiveSimulado,

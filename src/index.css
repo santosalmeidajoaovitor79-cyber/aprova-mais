@@ -2220,6 +2220,10 @@ body {
   padding: 22px;
 }
 
+.aprova-onboarding-stage-card {
+  animation: aprovaOnboardingStepIn 260ms ease;
+}
+
 .aprova-onboarding-question-head {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -2316,6 +2320,174 @@ body {
   line-height: 1.6;
 }
 
+.aprova-onboarding-mini-callout--info {
+  border-color: rgba(110, 231, 255, 0.16);
+  background: rgba(59, 130, 246, 0.08);
+  color: #dbeafe;
+}
+
+.aprova-onboarding-catalog-block {
+  padding: 18px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.aprova-onboarding-block-head {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.aprova-onboarding-block-head h4 {
+  margin: 6px 0 0;
+  font-size: 20px;
+  line-height: 1.15;
+}
+
+.aprova-onboarding-block-head p {
+  margin: 0;
+  color: #bcc5da;
+  line-height: 1.6;
+}
+
+.aprova-onboarding-block-kicker {
+  display: inline-flex;
+  color: #c4b5fd;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.aprova-onboarding-suggestion-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.aprova-onboarding-contest-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.aprova-onboarding-contest-meta span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #d8deed;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.aprova-onboarding-contest-status {
+  background: rgba(122, 92, 255, 0.18) !important;
+  color: #efe7ff !important;
+}
+
+.aprova-onboarding-search-results {
+  display: grid;
+  gap: 10px;
+}
+
+.aprova-onboarding-search-card {
+  width: 100%;
+  padding: 15px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.035);
+  color: #f8fafc;
+  text-align: left;
+  transition:
+    border-color var(--aprova-duration) var(--aprova-easing),
+    background var(--aprova-duration) var(--aprova-easing),
+    transform var(--aprova-duration) var(--aprova-easing),
+    box-shadow var(--aprova-duration) var(--aprova-easing);
+}
+
+.aprova-onboarding-search-card strong,
+.aprova-onboarding-search-card span,
+.aprova-onboarding-search-card em {
+  display: block;
+}
+
+.aprova-onboarding-search-card span {
+  margin-top: 5px;
+  color: #bcc5da;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.aprova-onboarding-search-card em {
+  color: #c4b5fd;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+  text-transform: lowercase;
+}
+
+.aprova-onboarding-search-card.active {
+  border-color: rgba(168, 85, 247, 0.5);
+  background: rgba(168, 85, 247, 0.12);
+  box-shadow: 0 12px 28px rgba(88, 28, 135, 0.18);
+}
+
+.aprova-onboarding-catalog-preview {
+  display: grid;
+  gap: 14px;
+}
+
+.aprova-onboarding-catalog-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.aprova-onboarding-ready-item small {
+  display: block;
+  margin-top: 10px;
+  color: #bcc5da;
+  line-height: 1.55;
+}
+
+.aprova-onboarding-yara-response {
+  margin-top: 18px;
+  padding: 16px 18px;
+  border-radius: 20px 20px 20px 10px;
+  border: 1px solid rgba(110, 231, 255, 0.15);
+  background:
+    radial-gradient(circle at top left, rgba(110, 231, 255, 0.08), transparent 40%),
+    rgba(255, 255, 255, 0.035);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.18);
+}
+
+.aprova-onboarding-yara-response-label {
+  display: inline-flex;
+  margin-bottom: 8px;
+  color: #93c5fd;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.aprova-onboarding-yara-response p {
+  margin: 0;
+  color: #eef2ff;
+  line-height: 1.65;
+}
+
 .aprova-onboarding-choice-grid {
   margin-top: 20px;
   display: grid;
@@ -2363,6 +2535,73 @@ body {
   border-color: rgba(168, 85, 247, 0.5);
   background: rgba(168, 85, 247, 0.14);
   box-shadow: 0 12px 28px rgba(88, 28, 135, 0.18);
+}
+
+.aprova-onboarding-ready-card {
+  margin-top: 20px;
+  display: grid;
+  gap: 18px;
+}
+
+.aprova-onboarding-ready-hero {
+  padding: 20px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    radial-gradient(circle at top right, rgba(122, 92, 255, 0.14), transparent 35%),
+    rgba(255, 255, 255, 0.035);
+}
+
+.aprova-onboarding-ready-kicker {
+  display: inline-flex;
+  margin-bottom: 12px;
+  color: #c4b5fd;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.aprova-onboarding-ready-hero h4 {
+  margin: 0;
+  font-size: clamp(26px, 3vw, 34px);
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+}
+
+.aprova-onboarding-ready-hero p {
+  margin: 10px 0 0;
+  color: #cfd5e6;
+  line-height: 1.7;
+}
+
+.aprova-onboarding-ready-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.aprova-onboarding-ready-item {
+  padding: 18px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.aprova-onboarding-ready-item span {
+  display: block;
+  margin-bottom: 8px;
+  color: #aeb7cf;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.aprova-onboarding-ready-item strong {
+  display: block;
+  color: #f8fafc;
+  line-height: 1.6;
 }
 
 .aprova-onboarding-actions {
@@ -2419,6 +2658,274 @@ body {
   background: rgba(22, 163, 74, 0.08);
 }
 
+.aprova-admin-nav {
+  display: flex;
+  align-items: center;
+}
+
+.aprova-admin-nav-link {
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: #f8fafc;
+  font-weight: 700;
+}
+
+.aprova-admin-page {
+  width: 100%;
+}
+
+.aprova-admin-shell {
+  width: min(1320px, 100%);
+  margin: 0 auto;
+  display: grid;
+  gap: 18px;
+}
+
+.aprova-admin-header,
+.aprova-admin-card,
+.aprova-admin-empty-state {
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    radial-gradient(circle at top right, rgba(122, 92, 255, 0.1), transparent 30%),
+    rgba(12, 12, 18, 0.72);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.2);
+}
+
+.aprova-admin-header,
+.aprova-admin-card {
+  padding: 24px;
+}
+
+.aprova-admin-empty-state {
+  padding: 36px 24px;
+  text-align: center;
+}
+
+.aprova-admin-kicker,
+.aprova-admin-section-kicker {
+  display: inline-flex;
+  color: #c4b5fd;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.aprova-admin-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.aprova-admin-header h1,
+.aprova-admin-card h2,
+.aprova-admin-empty-state h1 {
+  margin: 8px 0 0;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.aprova-admin-header p,
+.aprova-admin-card-head p,
+.aprova-admin-empty-state p {
+  margin: 10px 0 0;
+  color: #c5cbda;
+  line-height: 1.65;
+}
+
+.aprova-admin-grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.92fr) minmax(420px, 1.08fr);
+  gap: 18px;
+}
+
+.aprova-admin-grid--tree {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.aprova-admin-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.aprova-admin-inline-form,
+.aprova-admin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.aprova-admin-inline-form {
+  margin-bottom: 16px;
+}
+
+.aprova-admin-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.aprova-admin-field {
+  display: grid;
+  gap: 8px;
+}
+
+.aprova-admin-field span {
+  color: #d9deea;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.aprova-admin-input {
+  min-height: 48px;
+  padding: 0 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+}
+
+.aprova-admin-report-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.aprova-admin-report-meta span {
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.045);
+  color: #cfd5e4;
+  font-size: 0.92rem;
+}
+
+.aprova-admin-report-empty {
+  margin-top: 16px;
+}
+
+.aprova-admin-report-output {
+  width: 100%;
+  min-height: 320px;
+  margin-top: 18px;
+  padding: 16px;
+  resize: vertical;
+  line-height: 1.65;
+  font-family: "IBM Plex Sans", "Inter", system-ui, sans-serif;
+}
+
+.aprova-admin-primary,
+.aprova-admin-ghost,
+.aprova-admin-back,
+.aprova-admin-search-card {
+  min-height: 46px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 800;
+}
+
+.aprova-admin-primary,
+.aprova-admin-back {
+  border: 0;
+  padding: 0 18px;
+  color: #fff;
+  background: linear-gradient(135deg, #7a5cff 0%, #8c6dff 55%, #6ee7ff 130%);
+  box-shadow: 0 12px 36px rgba(139, 92, 246, 0.22);
+}
+
+.aprova-admin-ghost {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0 14px;
+  color: #eef2ff;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.aprova-admin-ghost--danger {
+  border-color: rgba(248, 113, 113, 0.24);
+  color: #fecaca;
+}
+
+.aprova-admin-list,
+.aprova-admin-table {
+  display: grid;
+  gap: 12px;
+}
+
+.aprova-admin-list-row,
+.aprova-admin-table-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.aprova-admin-table-row.is-active {
+  border-color: rgba(168, 85, 247, 0.36);
+  box-shadow: 0 16px 34px rgba(88, 28, 135, 0.16);
+  background: rgba(168, 85, 247, 0.1);
+}
+
+.aprova-admin-list-row strong,
+.aprova-admin-table-main strong {
+  display: block;
+}
+
+.aprova-admin-list-row span,
+.aprova-admin-table-main span {
+  display: block;
+  margin-top: 6px;
+  color: #b8c0d3;
+  line-height: 1.55;
+}
+
+.aprova-admin-table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.aprova-admin-error {
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(248, 113, 113, 0.2);
+  background: rgba(127, 29, 29, 0.2);
+  color: #fecaca;
+}
+
+@keyframes aprovaOnboardingStepIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aprova-onboarding-stage-card {
+    animation: none !important;
+  }
+}
+
 @media (max-width: 1180px) {
   .aprova-auth-grid {
     grid-template-columns: 1fr;
@@ -2449,6 +2956,26 @@ body {
 
   .aprova-auth-panel-surface {
     max-width: none;
+  }
+
+  .aprova-onboarding-ready-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .aprova-onboarding-suggestion-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .aprova-onboarding-catalog-preview-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .aprova-admin-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .aprova-admin-grid--tree {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -2491,6 +3018,27 @@ body {
   .aprova-auth-benefits,
   .aprova-onboarding-choice-grid,
   .aprova-onboarding-segment {
+    grid-template-columns: 1fr;
+  }
+
+  .aprova-onboarding-ready-hero,
+  .aprova-onboarding-ready-item {
+    padding: 18px;
+  }
+
+  .aprova-onboarding-catalog-block,
+  .aprova-onboarding-search-card {
+    padding: 16px;
+  }
+
+  .aprova-admin-header,
+  .aprova-admin-list-row,
+  .aprova-admin-table-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .aprova-admin-form-grid {
     grid-template-columns: 1fr;
   }
 
@@ -7184,6 +7732,128 @@ body {
   margin-top: 10px;
 }
 
+.aprova-billing-panel {
+  display: grid;
+  gap: 22px;
+}
+
+.aprova-billing-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: flex-start;
+}
+
+.aprova-billing-current {
+  min-width: min(320px, 100%);
+  display: grid;
+  gap: 8px;
+  padding: 16px 18px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.aprova-billing-current span {
+  color: #cfc4ff;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.aprova-billing-current strong {
+  font-size: 1rem;
+  color: #fff;
+}
+
+.aprova-billing-current small {
+  color: #bfc6d8;
+  font-size: 0.9rem;
+}
+
+.aprova-billing-summary-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.aprova-billing-toggle {
+  display: inline-flex;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.aprova-billing-toggle button {
+  min-height: 42px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #d8dcef;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.aprova-billing-toggle button.is-active {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.22), rgba(236, 72, 153, 0.18));
+  color: #fff;
+}
+
+.aprova-billing-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.aprova-billing-card {
+  padding: 22px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.aprova-billing-card.is-featured {
+  border-color: rgba(196, 181, 253, 0.2);
+  background: linear-gradient(180deg, rgba(139, 92, 246, 0.08), rgba(255, 255, 255, 0.035));
+}
+
+.aprova-billing-card.is-current {
+  border-color: rgba(110, 231, 255, 0.22);
+}
+
+.aprova-billing-card-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.aprova-billing-card-top h3 {
+  margin: 14px 0 8px;
+  font-size: 1.45rem;
+}
+
+.aprova-billing-card-top p {
+  margin: 0;
+  color: #c7cbdb;
+  line-height: 1.6;
+}
+
+.aprova-billing-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
+.aprova-billing-footer-note {
+  color: #b9c0d3;
+  line-height: 1.6;
+}
+
 .aprova-organic-primary-btn,
 .aprova-organic-secondary-btn {
   height: 52px;
@@ -8522,6 +9192,15 @@ body {
     margin-right: auto;
   }
 
+  .aprova-billing-head,
+  .aprova-billing-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .aprova-billing-head {
+    display: grid;
+  }
+
   .aprova-profile-journey {
     justify-content: center;
   }
@@ -8555,6 +9234,10 @@ body {
   .aprova-profile-stop {
     font-size: 0.9rem;
     padding: 12px 14px;
+  }
+
+  .aprova-billing-grid {
+    grid-template-columns: 1fr;
   }
 
   .aprova-dashboard-river {
@@ -11633,6 +12316,160 @@ option {
   margin-top: 26px;
 }
 
+.aprova-pricing-section {
+  padding-top: 96px;
+  padding-bottom: 28px;
+}
+
+.aprova-pricing-heading {
+  max-width: 860px;
+}
+
+.aprova-pricing-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  margin-top: 28px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.aprova-pricing-toggle button {
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 0;
+  background: transparent;
+  color: #d8dcef;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.aprova-pricing-toggle button.is-active {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.22), rgba(236, 72, 153, 0.18));
+  color: #fff;
+  box-shadow: 0 10px 26px rgba(139, 92, 246, 0.16);
+}
+
+.aprova-pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 28px;
+}
+
+.aprova-pricing-card {
+  padding: 24px;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    radial-gradient(circle at top right, rgba(110, 231, 255, 0.08), transparent 26%),
+    rgba(10, 11, 20, 0.7);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(16px);
+}
+
+.aprova-pricing-card.is-featured {
+  border-color: rgba(196, 181, 253, 0.2);
+  box-shadow:
+    0 22px 64px rgba(0, 0, 0, 0.26),
+    0 0 0 1px rgba(139, 92, 246, 0.12);
+}
+
+.aprova-pricing-card.is-current {
+  border-color: rgba(110, 231, 255, 0.24);
+}
+
+.aprova-pricing-card-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.aprova-pricing-card-top h3 {
+  margin: 14px 0 8px;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+.aprova-pricing-card-top p {
+  margin: 0;
+  color: #c7cbdb;
+  line-height: 1.65;
+}
+
+.aprova-pricing-kicker,
+.aprova-billing-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #e7ddff;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.aprova-pricing-badge,
+.aprova-billing-badge {
+  align-self: flex-start;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(110, 231, 255, 0.12);
+  border: 1px solid rgba(110, 231, 255, 0.2);
+  color: #d8fbff;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.aprova-pricing-price,
+.aprova-billing-price {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.aprova-pricing-price strong,
+.aprova-billing-price strong {
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1;
+}
+
+.aprova-pricing-price span,
+.aprova-billing-price span {
+  color: #bcc3d7;
+  font-size: 1rem;
+  padding-bottom: 6px;
+}
+
+.aprova-pricing-list,
+.aprova-billing-list {
+  display: grid;
+  gap: 12px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.aprova-pricing-list li,
+.aprova-billing-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #e7e9f3;
+}
+
+.aprova-pricing-actions {
+  display: grid;
+  gap: 12px;
+  margin-top: 24px;
+}
+
 @media (max-width: 1100px) {
   .aprova-landing-hero,
   .aprova-yara-section {
@@ -11640,7 +12477,8 @@ option {
   }
 
   .aprova-feature-grid,
-  .aprova-flow-row {
+  .aprova-flow-row,
+  .aprova-pricing-grid {
     grid-template-columns: 1fr;
   }
 
@@ -12434,5 +13272,156 @@ option {
     transform: none !important;
     translate: 0 0 !important;
     opacity: 1 !important;
+  }
+}
+
+.aprova-upgrade-notice {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 14px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(168, 85, 247, 0.28);
+  background:
+    linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(168, 85, 247, 0.08)),
+    rgba(10, 12, 24, 0.86);
+  overflow: hidden;
+}
+
+.aprova-upgrade-notice--subtle {
+  margin-top: 12px;
+  background:
+    linear-gradient(135deg, rgba(76, 29, 149, 0.14), rgba(30, 41, 59, 0.1)),
+    rgba(10, 12, 24, 0.8);
+}
+
+.aprova-upgrade-notice__glow,
+.aprova-premium-feature-card__glow {
+  position: absolute;
+  inset: auto -20% -45% -10%;
+  height: 82%;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.3), rgba(168, 85, 247, 0));
+  pointer-events: none;
+}
+
+.aprova-upgrade-notice__body {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.aprova-upgrade-notice__kicker,
+.aprova-premium-feature-card__eyebrow {
+  display: inline-block;
+  margin-bottom: 8px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(216, 180, 254, 0.92);
+}
+
+.aprova-upgrade-notice__title,
+.aprova-premium-feature-card__title {
+  display: block;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #f5f3ff;
+}
+
+.aprova-upgrade-notice__text,
+.aprova-premium-feature-card__description {
+  margin: 8px 0 0;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.aprova-upgrade-notice__cta,
+.aprova-premium-feature-card__cta {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 999px;
+  padding: 11px 16px;
+  font-weight: 700;
+  color: #faf5ff;
+  background: linear-gradient(135deg, #7c3aed, #c084fc);
+  box-shadow: 0 16px 36px rgba(124, 58, 237, 0.24);
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    opacity 180ms ease;
+}
+
+.aprova-upgrade-notice__cta:hover,
+.aprova-premium-feature-card__cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 20px 42px rgba(124, 58, 237, 0.3);
+}
+
+.aprova-usage-limit-notice-wrap {
+  margin-top: 12px;
+}
+
+.aprova-usage-limit-notice__meta {
+  margin: 0 0 10px;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.aprova-premium-feature-card {
+  position: relative;
+  margin-top: 14px;
+  padding: 22px 22px 20px;
+  border-radius: 24px;
+  border: 1px solid rgba(168, 85, 247, 0.24);
+  background:
+    linear-gradient(180deg, rgba(17, 24, 39, 0.92), rgba(9, 12, 24, 0.96)),
+    rgba(9, 12, 24, 0.92);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  overflow: hidden;
+}
+
+.aprova-premium-feature-card--compact {
+  padding: 18px;
+}
+
+.aprova-premium-feature-card__list {
+  position: relative;
+  z-index: 1;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.aprova-premium-feature-card__list li {
+  color: rgba(255, 255, 255, 0.74);
+  font-size: 0.88rem;
+}
+
+.aprova-premium-feature-card__list li::before {
+  content: "•";
+  margin-right: 8px;
+  color: rgba(216, 180, 254, 0.92);
+}
+
+@media (max-width: 720px) {
+  .aprova-upgrade-notice {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .aprova-upgrade-notice__cta,
+  .aprova-premium-feature-card__cta {
+    width: 100%;
   }
 }

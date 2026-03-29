@@ -2,6 +2,7 @@ import { memo, useMemo, useRef } from "react";
 import { Sparkles } from "lucide-react";
 import { ChatMessageBubble, YARA_NAME, YARA_ROLE_LABEL } from "./ChatMessageBubble.jsx";
 import { ExamReadinessStrip } from "./ExamReadinessStrip.jsx";
+import { PremiumFeatureCard } from "./PremiumFeatureCard.jsx";
 
 function missionPreviewLabel(m) {
   const s = m?.label?.trim() || "";
@@ -53,6 +54,8 @@ function StudyWelcomeShellComponent({
   examReadiness = null,
   simuladoBusy = false,
   onStartAdaptiveSimulado,
+  featureAccess = null,
+  onUpgradeToPro,
 }) {
   const progressWidth =
     typeof progressPct === "number" && Number.isFinite(progressPct)
@@ -236,7 +239,9 @@ function StudyWelcomeShellComponent({
               ) : null}
             </div>
 
-            {examReadiness ? <ExamReadinessStrip readiness={examReadiness} /> : null}
+            {featureAccess?.canUsePremiumInsights && examReadiness ? (
+              <ExamReadinessStrip readiness={examReadiness} />
+            ) : null}
 
             <div className="aprova-study-welcome-hero-cta">
               <button type="button" className="aprova-study-welcome-cta-primary" onClick={onStartNow}>
@@ -371,32 +376,47 @@ function StudyWelcomeShellComponent({
                 sem ficar preso num único tema. Checagem leve de prontidão; a Yara fecha com um diagnóstico curto no
                 chat.
               </p>
-              <div className="aprova-simulado-welcome-row">
-                <button
-                  type="button"
-                  className="aprova-simulado-welcome-btn"
-                  disabled={simuladoBusy || catalogLoading}
-                  onClick={() => onStartAdaptiveSimulado(5)}
-                >
-                  5 questões
-                </button>
-                <button
-                  type="button"
-                  className="aprova-simulado-welcome-btn"
-                  disabled={simuladoBusy || catalogLoading}
-                  onClick={() => onStartAdaptiveSimulado(8)}
-                >
-                  8 questões
-                </button>
-                <button
-                  type="button"
-                  className="aprova-simulado-welcome-btn"
-                  disabled={simuladoBusy || catalogLoading}
-                  onClick={() => onStartAdaptiveSimulado(10)}
-                >
-                  10 questões
-                </button>
-              </div>
+              {featureAccess && !featureAccess.canUseAdvancedSimulado ? (
+                <PremiumFeatureCard
+                  compact
+                  title="Simulados adaptativos entram no Yara Pro."
+                  description="Quando você quiser medir ritmo, misturar fraquezas e receber um diagnóstico mais inteligente, a experiência completa está no Pro."
+                  bullets={[
+                    "Simulado com mistura inteligente de tópicos",
+                    "Leitura curta do seu momento no final",
+                    "Sem travar seu fluxo de estudo",
+                  ]}
+                  ctaLabel="Desbloquear Yara Pro"
+                  onUpgrade={onUpgradeToPro}
+                />
+              ) : (
+                <div className="aprova-simulado-welcome-row">
+                  <button
+                    type="button"
+                    className="aprova-simulado-welcome-btn"
+                    disabled={simuladoBusy || catalogLoading}
+                    onClick={() => onStartAdaptiveSimulado(5)}
+                  >
+                    5 questões
+                  </button>
+                  <button
+                    type="button"
+                    className="aprova-simulado-welcome-btn"
+                    disabled={simuladoBusy || catalogLoading}
+                    onClick={() => onStartAdaptiveSimulado(8)}
+                  >
+                    8 questões
+                  </button>
+                  <button
+                    type="button"
+                    className="aprova-simulado-welcome-btn"
+                    disabled={simuladoBusy || catalogLoading}
+                    onClick={() => onStartAdaptiveSimulado(10)}
+                  >
+                    10 questões
+                  </button>
+                </div>
+              )}
             </div>
           ) : null}
         </article>

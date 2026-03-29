@@ -1,5 +1,6 @@
 import { memo, useMemo, useState } from "react";
 import { goals } from "../constants/appConstants.js";
+import { BillingPanel } from "./BillingPanel.jsx";
 
 function ProfileOrganicPanelComponent({
   name,
@@ -23,6 +24,14 @@ function ProfileOrganicPanelComponent({
   topicsTotal = 0,
   quizAttempts = 0,
   nextStepHint,
+  subscription,
+  subscriptionAccess,
+  subscriptionLoading,
+  checkoutBusy,
+  portalBusy,
+  subscriptionError,
+  onStartCheckout,
+  onManageSubscription,
 }) {
   const [editing, setEditing] = useState(false);
 
@@ -180,6 +189,19 @@ function ProfileOrganicPanelComponent({
                 Ajustar direção
               </button>
             </aside>
+
+            <div className="aprova-profile-card-wide">
+              <BillingPanel
+                subscription={subscription}
+                access={subscriptionAccess}
+                loading={subscriptionLoading}
+                checkoutBusy={checkoutBusy}
+                portalBusy={portalBusy}
+                error={subscriptionError}
+                onSelectPlan={onStartCheckout}
+                onManageSubscription={onManageSubscription}
+              />
+            </div>
 
             <div className="aprova-panel-soft is-large aprova-profile-flow aprova-profile-journey-wrap aprova-profile-card-wide">
               <div className="aprova-profile-flow-header">

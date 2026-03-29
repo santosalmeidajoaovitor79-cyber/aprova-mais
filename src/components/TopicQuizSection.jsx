@@ -6,6 +6,8 @@ import {
   QUIZ_POSITIVE_MESSAGES,
   QUIZ_REVISE_MESSAGES,
 } from "../utils/quizFeedbackMessages.js";
+import { UpgradeInlineNotice } from "./UpgradeInlineNotice.jsx";
+import { UsageLimitNotice } from "./UsageLimitNotice.jsx";
 
 function buildMistakeChatPrompt(questionText, selectedLabel, correctLabel) {
   const stem = (questionText || "").trim().slice(0, 720);
@@ -173,10 +175,18 @@ function TopicQuizSectionComponent({
   onStartRecoveryTraining,
   simuladoMeta = null,
   simuladoResult = null,
+  featureAccess = null,
+  usageQuota = null,
+  onUpgradeToPro,
 }) {
   const hasQuestions = Boolean(questions?.length);
   const simuladoActive = Boolean(simuladoMeta);
   const recoveryActive = Boolean(recoveryTrainingMeta) && !simuladoActive;
+  const questionLimitReached = Boolean(featureAccess && !featureAccess.canUseQuestions);
+  const recoveryLimitReached = Boolean(featureAccess && !featureAccess.canUseBasicRecovery);
+  const questionUpgradeCopy = featureAccess?.getUpgradeCopy?.("questions");
+  const recoveryUpgradeCopy = featureAccess?.getUpgradeCopy?.("advancedRecovery");
+  const remainingQuestions = featureAccess?.getRemainingQuestionQuota?.();
 
   return (
     <section
@@ -212,11 +222,11 @@ function TopicQuizSectionComponent({
         <button
           type="button"
           onClick={onGenerate}
-          disabled={disabled || loading}
+          disabled={disabled || loading || questionLimitReached}
           className="aprova-btn-interactive"
           style={{
             ...styles.quickActionButtonPrimary,
-            ...(disabled || loading ? styles.quickActionButtonDisabled : {}),
+            ...(disabled || loading || questionLimitReached ? styles.quickActionButtonDisabled : {}),
           }}
         >
           {loading
@@ -246,6 +256,30 @@ function TopicQuizSectionComponent({
           </button>
         ) : null}
       </div>
+
+      {questionLimitReached && questionUpgradeCopy ? (
+        <UsageLimitNotice
+          title={questionUpgradeCopy.title}
+          description={questionUpgradeCopy.description}
+          remaining={remainingQuestions}
+          ctaLabel={questionUpgradeCopy.cta}
+          onUpgrade={onUpgradeToPro}
+        />
+      ) : usageQuota?.remainingQuestions != null && !simuladoActive ? (
+        <p className="aprova-usage-limit-notice__meta">
+          Hoje restam <strong>{usageQuota.remainingQuestions}</strong> questões neste plano.
+        </p>
+      ) : null}
+
+      {recoveryLimitReached && recoveryUpgradeCopy && !recoveryActive ? (
+        <UpgradeInlineNotice
+          title={recoveryUpgradeCopy.title}
+          description={recoveryUpgradeCopy.description}
+          ctaLabel={recoveryUpgradeCopy.cta}
+          onUpgrade={onUpgradeToPro}
+          subtle
+        />
+      ) : null}
 
       {error ? <p style={{ ...styles.errorText, marginTop: 12 }}>{error}</p> : null}
 
@@ -334,7 +368,7 @@ function TopicQuizSectionComponent({
                     {pick !== correct && !simuladoActive ? (
                       <YaraQuizMistakeCard
                         insight={quizMistakeByKey[key]}
-                        disabledActions={disabled || loading}
+                        disabledActions={disabled || loading || recoveryLimitReached}
                         onReviewTheory={() => onQuizReviewTheory?.()}
                         onTrainMore={() => void onStartRecoveryTraining?.(key)}
                         onExplainSimpler={() => onRequestSimplerQuizMistake?.(key)}

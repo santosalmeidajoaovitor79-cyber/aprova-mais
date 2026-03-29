@@ -2,6 +2,7 @@ import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { DashboardAiHero } from "./DashboardAiHero.jsx";
 import { styles } from "../styles/appStyles.js";
 import { computeDaysUntilExam } from "../utils/examDate.js";
+import { PremiumFeatureCard } from "./PremiumFeatureCard.jsx";
 
 const MISSION_SHORT = {
   errors_priority: "Prioridade: erros",
@@ -79,6 +80,8 @@ function DashboardStudyHubComponent({
   onOpenStudyTab,
   onMissionAction,
   onResumeAction,
+  featureAccess = null,
+  onUpgradeToPro,
 }) {
   const [missionToast, setMissionToast] = useState(null);
   const missionsInitRef = useRef(false);
@@ -125,6 +128,7 @@ function DashboardStudyHubComponent({
   const subjectAside = Boolean(!loading && subjectProgress?.length);
   const center = commandCenter ?? {};
   const firstPendingMission = dailyMissions.find((m) => !m.done && m.action);
+  const premiumInsightsLocked = Boolean(featureAccess && !featureAccess.canUsePremiumInsights);
 
   const dailyFocusLabel = useMemo(() => {
     if (dailyMissions.length > 0) return `Foco · ${missionShortLabel(dailyMissions[0])}`;
@@ -223,7 +227,17 @@ function DashboardStudyHubComponent({
     </aside>
   );
 
-  const momentPanel = (
+  const momentPanel = premiumInsightsLocked ? (
+    <PremiumFeatureCard
+      compact
+      className="aprova-dash-organic-panel aprova-dash-organic-band-flow aprova-dash-card-skin aprova-dash-span-6 aprova-dash-card--half"
+      title="A leitura mais profunda do seu momento fica no Yara Pro."
+      description="No Pro, a Yara cruza prazo, progresso e sinais de erro para mostrar o que merece sua energia agora."
+      bullets={["Visão do momento", "Prioridade mais inteligente", "Leitura premium da semana"]}
+      ctaLabel="Ativar Yara Pro"
+      onUpgrade={onUpgradeToPro}
+    />
+  ) : (
     <section className="aprova-dash-organic-panel aprova-dash-organic-band-flow aprova-dash-card-skin aprova-dash-span-6 aprova-dash-card--half">
       <span className="aprova-dash-card-kicker">{center?.momentVision?.title || "Visão do momento"}</span>
       <h3 className="aprova-dash-card-heading-sm">{loading ? "Carregando…" : center?.momentVision?.headline || "Seu momento de estudo"}</h3>
@@ -249,7 +263,17 @@ function DashboardStudyHubComponent({
     </section>
   );
 
-  const yaraRecommendationPanel = (
+  const yaraRecommendationPanel = premiumInsightsLocked ? (
+    <PremiumFeatureCard
+      compact
+      className="aprova-dash-organic-panel aprova-dash-organic-band-flow aprova-dash-card-skin aprova-dash-span-6 aprova-dash-card--half"
+      title="As recomendações premium da Yara entram no Pro."
+      description="Continue com o dashboard base e libere a camada mais estratégica quando quiser orientação mais profunda."
+      bullets={["Recomendações mais inteligentes", "Leitura premium da Yara", "Ajustes mais finos de prioridade"]}
+      ctaLabel="Ver Yara Pro"
+      onUpgrade={onUpgradeToPro}
+    />
+  ) : (
     <section className="aprova-dash-organic-panel aprova-dash-organic-band-flow aprova-dash-card-skin aprova-dash-span-6 aprova-dash-card--half">
       <span className="aprova-dash-card-kicker">{center?.yaraRecommendation?.title || "Recomendação da Yara"}</span>
       <h3 className="aprova-dash-card-heading-sm">Leitura curta e útil</h3>
