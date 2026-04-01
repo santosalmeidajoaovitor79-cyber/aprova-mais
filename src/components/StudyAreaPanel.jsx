@@ -1,5 +1,5 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ChevronsDown, ListOrdered, MessageSquarePlus, Send, Sparkles } from "lucide-react";
+import { ChevronsDown, ListOrdered, MessageSquarePlus, Send } from "lucide-react";
 import { styles } from "../styles/appStyles.js";
 import { TopicQuizSection } from "./TopicQuizSection.jsx";
 import { TopicExplanationChunk, TopicExplanationContent } from "./TopicExplanationContent.jsx";
@@ -22,6 +22,7 @@ import {
   progressivePartsSignature,
 } from "../utils/progressiveExplanationParts.js";
 import { ExamReadinessStrip } from "./ExamReadinessStrip.jsx";
+import { AiHint } from "./AiHint.jsx";
 
 /** Card leve: mini-sessão sugerida pela Yara (2–3 passos; alinhado ao tema lilás / dark premium). */
 function YaraMiniSessionCard({ session, subdued }) {
@@ -418,8 +419,8 @@ function TopicStudyWorkspace({
     <>
       <header className="aprova-chat-header aprova-chat-header--topic-yara">
         <div className="aprova-chat-header-main">
-          <div className="aprova-chat-header-avatar aprova-chat-header-avatar--topic" aria-hidden="true">
-            <Sparkles size={22} strokeWidth={2.2} />
+          <div className="aprova-chat-header-avatar aprova-chat-header-avatar--topic aprova-chat-header-avatar--y" aria-hidden="true">
+            <span className="aprova-chat-avatar-letter">Y</span>
           </div>
           <div className="aprova-chat-header-copy">
             <p className="aprova-chat-header-eyebrow">
@@ -445,6 +446,9 @@ function TopicStudyWorkspace({
           </button>
         </div>
       </header>
+      <AiHint className="aprova-chat-header-ai-hint">
+        Respostas da Yara usam este tópico, seu edital e o que você já praticou aqui.
+      </AiHint>
       <p className="aprova-chat-header-sub aprova-chat-header-sub--topic">
         A leitura inicial chega em mensagens curtas da {YARA_NAME} — você pode responder a qualquer momento. Use os
         atalhos ou escreva para simplificar, exemplificar ou aprofundar. O histórico fica salvo;{" "}

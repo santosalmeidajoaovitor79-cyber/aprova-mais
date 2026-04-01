@@ -188,7 +188,7 @@ function OnboardingModalComponent({ open, user, contests, studyApi, onFinished }
         subjectMap.set(row.subject_id, {
           id: row.subject_id,
           name: row.subject_name,
-          weight: row.subject_weight,
+          weight: row.subject_weight ?? null,
           topicNames: [],
         });
       }
@@ -561,19 +561,6 @@ function OnboardingModalComponent({ open, user, contests, studyApi, onFinished }
 
   async function createContestFromCatalog(catalogEntry) {
     if (!catalogEntry?.name?.trim()) return null;
-
-    const existingByCatalogId = contests.find(
-      (item) => item?.source_catalog_id && item.source_catalog_id === catalogEntry.id
-    );
-
-    if (existingByCatalogId?.id) {
-      setResolvedContestSelection({
-        id: existingByCatalogId.id,
-        label: existingByCatalogId.name.trim(),
-        catalogId: catalogEntry.id,
-      });
-      return { id: existingByCatalogId.id, label: existingByCatalogId.name.trim() };
-    }
 
     setBusy(true);
     try {

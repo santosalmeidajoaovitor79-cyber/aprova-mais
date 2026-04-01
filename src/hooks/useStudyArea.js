@@ -142,22 +142,22 @@ export function useStudyArea(
 
   const contestTreeContext = useMemo(
     () => ({
-      source: selectedContest?.source_catalog_id ? "contest_catalog" : "runtime_fallback",
-      contestCatalogId: selectedContest?.source_catalog_id ?? null,
+      source: "runtime_fallback",
+      contestCatalogId: null,
       subjects: subjectsList.slice(0, 12).map((subject) => ({
         id: subject.id,
         name: subject.name,
-        weight: subject.weight ?? null,
-        displayOrder: subject.display_order ?? null,
+        weight: subject?.weight ?? null,
+        displayOrder: subject?.display_order ?? null,
       })),
       currentSubjectTopics: topicsList.slice(0, 20).map((topic) => ({
         id: topic.id,
         name: topic.name,
-        weight: topic.weight ?? null,
-        displayOrder: topic.display_order ?? null,
+        weight: topic?.weight ?? null,
+        displayOrder: topic?.display_order ?? null,
       })),
     }),
-    [selectedContest?.source_catalog_id, subjectsList, topicsList]
+    [subjectsList, topicsList]
   );
 
   const aiPayload = useMemo(

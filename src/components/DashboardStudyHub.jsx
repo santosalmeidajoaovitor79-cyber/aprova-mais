@@ -1,5 +1,6 @@
 import { memo, useEffect, useMemo, useRef, useState } from "react";
-import { DashboardAiHero } from "./DashboardAiHero.jsx";
+import { DashboardHero } from "./DashboardHero.jsx";
+import { AiHint } from "./AiHint.jsx";
 import { styles } from "../styles/appStyles.js";
 import { computeDaysUntilExam } from "../utils/examDate.js";
 import { PremiumFeatureCard } from "./PremiumFeatureCard.jsx";
@@ -13,14 +14,6 @@ const MISSION_SHORT = {
   combo: "Tópico + quiz",
   fix_errors: "Rever erros",
 };
-
-const VIBES = [
-  "Cada sessão conta para o seu edital.",
-  "Manter o ritmo é metade da preparação.",
-  "Um tópico de cada vez já muda o resultado.",
-  "Hoje vale revisar o que ainda treme.",
-  "Questões do que você leu fixam melhor o conteúdo.",
-];
 
 function firstName(displayName) {
   const s = String(displayName || "").trim();
@@ -89,7 +82,6 @@ function DashboardStudyHubComponent({
 
   const daysLeft = computeDaysUntilExam(examDate);
   const fn = firstName(displayName);
-  const vibe = VIBES[(studyStreak + (fn.length || 0)) % VIBES.length];
 
   const recentShort = recentRows.slice(0, 5);
 
@@ -160,77 +152,10 @@ function DashboardStudyHubComponent({
   const catalogLabel =
     topicsTotal > 0 ? `${topicsStudied}/${topicsTotal}` : loading ? "—" : String(topicsStudied ?? "—");
 
-  function runCommandCenterAction(action) {
-    if (action === "chat") {
-      onResumeAction?.("chat");
-      return;
-    }
-    if (action === "study_now") {
-      onStudyNow?.();
-      return;
-    }
-    if (action === "review_errors") {
-      onReviewErrors?.();
-      return;
-    }
-    if (action === "do_questions") {
-      onDoQuestions?.();
-      return;
-    }
-    if (onResumeAction && action === "review_errors") {
-      onResumeAction("review_errors");
-      return;
-    }
-    onOpenStudyTab?.();
-  }
-
-  const nextFocusPanel = (
-    <aside className="aprova-dash-organic-panel aprova-dash-organic-panel-focus aprova-dash-organic-band-flow aprova-dash-card-skin aprova-dash-span-4 aprova-dash-card--side">
-      <span className="aprova-dash-card-kicker">{center?.nextBestStep?.title || "Próximo melhor passo"}</span>
-      <h3 className="aprova-dash-card-heading-sm">{loading ? "Carregando…" : center?.nextBestStep?.emphasis || "Sugestão inteligente"}</h3>
-      <p className="aprova-dash-card-text-clamp" title={suggestion || ""}>
-        {loading
-          ? "Carregando…"
-          : center?.nextBestStep?.text ||
-            suggestion ||
-            "A Yara prioriza o próximo tópico com base no seu ritmo e no edital."}
-      </p>
-      <div className="aprova-dash-card-meta-row" aria-hidden="true">
-        <span className="aprova-dash-mini-pill aprova-dash-mini-pill--accent">{loading ? "…" : center?.nextBestStep?.emphasis || "Hoje"}</span>
-        <span className="aprova-dash-mini-pill">Prioridade</span>
-        {examHint ? <span className="aprova-dash-mini-pill">{examHint}</span> : null}
-      </div>
-      {planLines.length > 0 ? (
-        <ul className="aprova-dash-card-bullet-list">
-          {planLines.slice(0, 2).map((line, i) => (
-            <li key={i}>{line.length > 120 ? `${line.slice(0, 118)}…` : line}</li>
-          ))}
-        </ul>
-      ) : (
-        <div className="aprova-dash-card-pill-row">
-          <span className="aprova-dash-stat-pill-tag">Explicação</span>
-          <span className="aprova-dash-stat-pill-tag">Questões</span>
-          <span className="aprova-dash-stat-pill-tag">Chat Yara</span>
-        </div>
-      )}
-      <div className="aprova-dash-ai-hero-cta" style={{ marginTop: 14 }}>
-        <button
-          type="button"
-          onClick={() => runCommandCenterAction(center?.nextBestStep?.ctaAction)}
-          className="aprova-btn-interactive"
-          style={{ ...styles.dashV2ActionBtn, ...styles.dashV2ActionBtnPurple, padding: "12px 10px" }}
-        >
-          {loading ? "Abrir" : center?.nextBestStep?.ctaLabel || "Abrir estudo"}
-          <span style={styles.dashV2ActionSub}>{loading ? "…" : center?.nextBestStep?.emphasis || "Agora"}</span>
-        </button>
-      </div>
-    </aside>
-  );
-
   const momentPanel = premiumInsightsLocked ? (
     <PremiumFeatureCard
       compact
-      className="aprova-dash-organic-panel aprova-dash-organic-band-flow aprova-dash-card-skin aprova-dash-span-6 aprova-dash-card--half"
+      className="aprova-dash-tier-secondary"
       title="A leitura mais profunda do seu momento fica no Yara Pro."
       description="No Pro, a Yara cruza prazo, progresso e sinais de erro para mostrar o que merece sua energia agora."
       bullets={["Visão do momento", "Prioridade mais inteligente", "Leitura premium da semana"]}
@@ -238,7 +163,7 @@ function DashboardStudyHubComponent({
       onUpgrade={onUpgradeToPro}
     />
   ) : (
-    <section className="aprova-dash-organic-panel aprova-dash-organic-band-flow aprova-dash-card-skin aprova-dash-span-6 aprova-dash-card--half">
+    <section className="aprova-panel-soft is-large aprova-dashboard-secondary-card aprova-dash-tier-secondary">
       <span className="aprova-dash-card-kicker">{center?.momentVision?.title || "Visão do momento"}</span>
       <h3 className="aprova-dash-card-heading-sm">{loading ? "Carregando…" : center?.momentVision?.headline || "Seu momento de estudo"}</h3>
       <div className="aprova-dash-card-meta-row">
@@ -266,7 +191,7 @@ function DashboardStudyHubComponent({
   const yaraRecommendationPanel = premiumInsightsLocked ? (
     <PremiumFeatureCard
       compact
-      className="aprova-dash-organic-panel aprova-dash-organic-band-flow aprova-dash-card-skin aprova-dash-span-6 aprova-dash-card--half"
+      className="aprova-dash-tier-secondary"
       title="As recomendações premium da Yara entram no Pro."
       description="Continue com o dashboard base e libere a camada mais estratégica quando quiser orientação mais profunda."
       bullets={["Recomendações mais inteligentes", "Leitura premium da Yara", "Ajustes mais finos de prioridade"]}
@@ -274,7 +199,7 @@ function DashboardStudyHubComponent({
       onUpgrade={onUpgradeToPro}
     />
   ) : (
-    <section className="aprova-dash-organic-panel aprova-dash-organic-band-flow aprova-dash-card-skin aprova-dash-span-6 aprova-dash-card--half">
+    <section className="aprova-panel-soft is-large aprova-dashboard-secondary-card aprova-dash-tier-secondary">
       <span className="aprova-dash-card-kicker">{center?.yaraRecommendation?.title || "Recomendação da Yara"}</span>
       <h3 className="aprova-dash-card-heading-sm">Leitura curta e útil</h3>
       <p className="aprova-dash-card-text-clamp">
@@ -296,7 +221,7 @@ function DashboardStudyHubComponent({
   );
 
   const progressPill = (
-    <section className="aprova-dash-organic-stat-pill aprova-dash-organic-stat-progress aprova-dash-card-skin aprova-dash-span-6 aprova-dash-card--half">
+    <section className="aprova-dash-organic-stat-pill aprova-dash-organic-stat-progress aprova-dash-card-skin aprova-dash-card--half aprova-dash-nested-card">
       <span className="aprova-dash-card-kicker aprova-dash-card-kicker--green">Progresso até a prova</span>
       <p className="aprova-dash-card-metric">{loading ? "—" : `${progressPct}%`}</p>
       <div className="aprova-dash-card-progress-line" role="progressbar" aria-valuenow={progressPct} aria-valuemin={0} aria-valuemax={100}>
@@ -353,7 +278,7 @@ function DashboardStudyHubComponent({
   );
 
   const evolutionPanel = (
-    <section className="aprova-dash-organic-panel aprova-dash-organic-evolution aprova-dash-organic-band-flow aprova-dash-card-skin aprova-dash-span-6 aprova-dash-card--half">
+    <section className="aprova-dash-organic-panel aprova-dash-organic-evolution aprova-dash-organic-band-flow aprova-dash-card-skin aprova-dash-card--half aprova-dash-nested-card">
       <span className="aprova-dash-section-kicker">{center?.progressRecent?.title || "Evolução"}</span>
       <h2 className="aprova-dash-section-heading aprova-dash-card-heading-tight">Progresso recente e pontos frágeis</h2>
       <p className="aprova-dash-section-lede aprova-dash-card-lede-tight">
@@ -398,7 +323,7 @@ function DashboardStudyHubComponent({
         <p className="aprova-dash-section-muted">Pratique questões no Estudo para ver chips de evolução aqui.</p>
       )}
       {!loading ? (
-        <div className="aprova-dash-evolution-chips" style={{ marginTop: 12 }}>
+        <div className="aprova-dash-evolution-chips" style={{ marginTop: 8 }}>
           {(center?.progressRecent?.weakTopics?.length
             ? center.progressRecent.weakTopics
             : [center?.progressRecent?.fallbackWeakLine]
@@ -416,11 +341,7 @@ function DashboardStudyHubComponent({
   );
 
   const historyPanel = (
-    <section
-      className={`aprova-dash-organic-panel aprova-dash-organic-history aprova-dash-organic-band-flow aprova-dash-card-skin aprova-dash-card--half ${
-        subjectAside ? "aprova-dash-span-6" : "aprova-dash-span-12"
-      }`}
-    >
+    <section className="aprova-panel-soft is-large aprova-dash-organic-history aprova-dashboard-secondary-card aprova-dash-tier-secondary">
       <span className="aprova-dash-section-kicker">Histórico</span>
       <h2 className="aprova-dash-section-heading aprova-dash-card-heading-tight">Trilha recente</h2>
       <div className="aprova-dash-card-meta-row">
@@ -434,7 +355,7 @@ function DashboardStudyHubComponent({
           Nada aqui ainda. Use <strong>Continuar estudo</strong> no bloco da Yara acima.
         </p>
       ) : (
-        <ul className="aprova-dash-history-trail aprova-dash-history-flex-grow" aria-label="Passos recentes de estudo">
+        <ul className="aprova-dash-history-trail" aria-label="Passos recentes de estudo">
           {recentShort.map((rowItem) => {
             const topic =
               rowItem.topicName.length > 56 ? `${rowItem.topicName.slice(0, 54)}…` : rowItem.topicName;
@@ -467,7 +388,7 @@ function DashboardStudyHubComponent({
 
   const planWideCard =
     planLines.length > 0 ? (
-      <section className="aprova-dash-organic-panel aprova-dash-organic-band-flow aprova-dash-card-skin aprova-dash-span-12 aprova-dash-card--wide">
+      <section className="aprova-panel-soft is-large aprova-dashboard-grid-span-full aprova-dashboard-secondary-card aprova-dash-tier-secondary">
         <span className="aprova-dash-card-kicker">Próximos passos · IA</span>
         <h2 className="aprova-dash-section-heading aprova-dash-card-heading-tight">Rota sugerida nos próximos dias</h2>
         <p className="aprova-dash-section-lede aprova-dash-card-lede-tight">
@@ -484,198 +405,255 @@ function DashboardStudyHubComponent({
       </section>
     ) : null;
 
+  const heroNextDescription =
+    center?.nextBestStep?.text || suggestion || studyNowHint || undefined;
+  const heroAiHint =
+    quizWrong > 0
+      ? "A Yara ajustou seu plano com base nos seus últimos erros."
+      : resumeJourney?.whereLine
+        ? "Com base no que você estudou, a revisão agora faz mais sentido que avançar."
+        : undefined;
+
+  const rhythmPanel = (
+    <section className="aprova-panel-soft is-large aprova-dashboard-secondary-card">
+      <span className="aprova-profile-section-kicker">Ritmo</span>
+      <h3 className="aprova-dashboard-secondary-card__title">Constância e revisão</h3>
+      <p className="aprova-dashboard-secondary-card__lede">
+        Mantenha a sequência e use o quiz para reforçar o que ainda falha.
+      </p>
+      <div className="aprova-dashboard-panel-stack">
+        {streakPill}
+        {revisionTrainPanel}
+      </div>
+    </section>
+  );
+
   return (
     <section className="aprova-dashboard-organic">
-      <div className="aprova-dashboard-organic-inner aprova-shell-wide">
-        <div className="aprova-dash-page-grid">
-          <DashboardAiHero
+      <div className="aprova-dashboard-bg-glow" aria-hidden="true" />
+      <div className="aprova-dashboard-bg-orbits" aria-hidden="true" />
+      <div className="aprova-container">
+        <div className="aprova-dashboard-flow">
+          <DashboardHero
+            userName={fn}
             loading={loading}
-            firstName={fn}
-            vibeLine={vibe}
+            nextStep={{ description: heroNextDescription }}
+            aiHint={heroAiHint}
+            progressPct={overallProgressPct}
             mainExamName={mainExamName}
             examCountdownText={examCountdownText}
-            overallProgressPct={overallProgressPct}
-            studyNowHint={studyNowHint}
-            suggestionShort={suggestion || ""}
             dailyFocusLabel={dailyFocusLabel}
-            onStudyNow={onStudyNow}
-            onOpenStudyTab={onOpenStudyTab}
+            onStart={onStudyNow}
+            onViewPlan={onOpenStudyTab}
+            secondaryChips={[
+              { label: "Explicação", onClick: () => onStudyNow?.() },
+              { label: "Questões", onClick: () => onDoQuestions?.() },
+              { label: "Chat", onClick: () => onResumeAction?.("chat") },
+            ]}
           />
 
-          <div className="aprova-dash-main-grid aprova-dash-main-grid--tight">
-            <section className="aprova-dash-organic-panel aprova-dash-organic-continue aprova-dash-organic-band-primary aprova-dash-card-skin aprova-dash-span-8 aprova-dash-card--hero">
-              <span className="aprova-dash-card-kicker">{center?.quickResume?.title || "Retomada rápida"}</span>
-              <h2 className="aprova-dash-card-heading">
-                {loading ? "Carregando…" : center?.quickResume?.headline || "Continue exatamente do ponto certo"}
-              </h2>
-              <div className="aprova-dash-card-enrich-stats">
-                <div className="aprova-dash-micro-stat">
-                  <span className="aprova-dash-micro-stat-lbl">Catálogo</span>
-                  <span className="aprova-dash-micro-stat-val">{catalogLabel}</span>
+          <div className="aprova-dashboard-grid-two">
+              <section className="aprova-panel-soft is-large aprova-dashboard-secondary-card">
+                <span className="aprova-profile-section-kicker">Progresso</span>
+                <h3 className="aprova-dashboard-secondary-card__title">Seu avanço</h3>
+                <p className="aprova-dashboard-secondary-card__lede">
+                  Resumo do que já andou e do que merece atenção agora.
+                </p>
+                <AiHint>Este ritmo mantém constância sem sobrecarga.</AiHint>
+                <div className="aprova-dashboard-panel-stack">
+                  {progressPill}
+                  {evolutionPanel}
                 </div>
-                <div className="aprova-dash-micro-stat">
-                  <span className="aprova-dash-micro-stat-lbl">Quiz</span>
-                  <span className="aprova-dash-micro-stat-val">{loading ? "—" : quizAttempts}</span>
-                </div>
-                <div className="aprova-dash-micro-stat">
-                  <span className="aprova-dash-micro-stat-lbl">Sequência</span>
-                  <span className="aprova-dash-micro-stat-val">{loading ? "—" : studyStreak}</span>
-                </div>
-              </div>
-              {loading ? (
-                <p className="aprova-dash-card-text-muted">Carregando…</p>
-              ) : (
-                <>
-                  {resumeJourney?.whereLine ? (
+              </section>
+
+              <section className="aprova-panel-soft is-large aprova-dashboard-secondary-card">
+                <span className="aprova-profile-section-kicker">Retomar</span>
+                <h3 className="aprova-dashboard-secondary-card__title">Voltar do ponto certo</h3>
+                <p className="aprova-dashboard-secondary-card__lede">
+                  Seu último contexto salvo, sem precisar recomeçar do zero.
+                </p>
+                <AiHint>Retomar aqui mantém a Yara alinhada ao que você já leu.</AiHint>
+                <div className="aprova-dash-resume-inner">
+                  <span className="aprova-dash-card-kicker">{center?.quickResume?.title || "Retomada rápida"}</span>
+                  <h4 className="aprova-dash-card-heading aprova-dash-resume-subhead">
+                    {loading ? "Carregando…" : center?.quickResume?.headline || "Continue exatamente do ponto certo"}
+                  </h4>
+                  <div className="aprova-dash-card-enrich-stats">
+                    <div className="aprova-dash-micro-stat">
+                      <span className="aprova-dash-micro-stat-lbl">Catálogo</span>
+                      <span className="aprova-dash-micro-stat-val">{catalogLabel}</span>
+                    </div>
+                    <div className="aprova-dash-micro-stat">
+                      <span className="aprova-dash-micro-stat-lbl">Quiz</span>
+                      <span className="aprova-dash-micro-stat-val">{loading ? "—" : quizAttempts}</span>
+                    </div>
+                    <div className="aprova-dash-micro-stat">
+                      <span className="aprova-dash-micro-stat-lbl">Sequência</span>
+                      <span className="aprova-dash-micro-stat-val">{loading ? "—" : studyStreak}</span>
+                    </div>
+                  </div>
+                  {loading ? (
+                    <p className="aprova-dash-card-text-muted">Carregando…</p>
+                  ) : (
                     <>
-                      <p className="aprova-dash-continue-headline" title={resumeJourney.topicName || lastTopicLabel || ""}>
-                        {resumeJourney.topicName || resumeTopicShort}
-                      </p>
-                      <div className="aprova-dash-card-meta-row" style={{ marginTop: 10 }}>
-                        {center?.quickResume?.badgeLabel ? (
-                          <span className="aprova-dash-mini-pill">{center.quickResume.badgeLabel}</span>
+                      {resumeJourney?.whereLine ? (
+                        <>
+                          <p
+                            className="aprova-dash-continue-headline"
+                            title={resumeJourney.topicName || lastTopicLabel || ""}
+                          >
+                            {resumeJourney.topicName || resumeTopicShort}
+                          </p>
+                          <div className="aprova-dash-card-meta-row" style={{ marginTop: 8 }}>
+                            {center?.quickResume?.badgeLabel ? (
+                              <span className="aprova-dash-mini-pill">{center.quickResume.badgeLabel}</span>
+                            ) : null}
+                            <span className="aprova-dash-mini-pill aprova-dash-mini-pill--accent">
+                              {resumeJourney.whereLine}
+                            </span>
+                          </div>
+                          {center?.quickResume?.supportLine ? (
+                            <p className="aprova-dash-card-text-muted" style={{ marginTop: 8 }}>
+                              {center.quickResume.supportLine}
+                            </p>
+                          ) : null}
+                          <p className="aprova-dash-card-text-muted">
+                            {center?.quickResume?.text || continueHint}
+                          </p>
+                        </>
+                      ) : (
+                        <p className="aprova-dash-card-text-muted">{center?.quickResume?.text || continueHint}</p>
+                      )}
+                      <div className="aprova-dash-ai-hero-cta" style={{ marginTop: 14 }}>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            onResumeAction?.(
+                              resumeJourney?.primaryAction || center?.nextBestStep?.ctaAction || "study_now"
+                            )
+                          }
+                          className="aprova-btn-interactive aprova-dash-organic-btn-strong aprova-dash-ai-cta-primary"
+                          style={styles.dashV2ContinuePrimaryBtn}
+                        >
+                          {resumeJourney?.primaryLabel || "Continuar estudo"}
+                        </button>
+                        {(center?.quickResume?.quickActions?.length ? center.quickResume.quickActions : [])
+                          .filter(
+                            (action) => action?.id && action.id !== (resumeJourney?.primaryAction || "study_now")
+                          )
+                          .slice(0, 2)
+                          .map((action) => (
+                            <button
+                              key={action.id}
+                              type="button"
+                              onClick={() => onResumeAction?.(action.id)}
+                              className="aprova-btn-interactive aprova-dash-organic-btn-strong aprova-dash-ai-cta-secondary"
+                              style={styles.dashV2ContinueSecondaryBtn}
+                            >
+                              {action.label}
+                            </button>
+                          ))}
+                        {!center?.quickResume?.quickActions?.length ? (
+                          <button
+                            type="button"
+                            onClick={onOpenStudyTab}
+                            className="aprova-btn-interactive aprova-dash-organic-btn-strong aprova-dash-ai-cta-secondary"
+                            style={styles.dashV2ContinueSecondaryBtn}
+                          >
+                            Ver matérias
+                          </button>
                         ) : null}
-                        <span className="aprova-dash-mini-pill aprova-dash-mini-pill--accent">
-                          {resumeJourney.whereLine}
-                        </span>
                       </div>
-                      {center?.quickResume?.supportLine ? (
-                        <p className="aprova-dash-card-text-muted" style={{ marginTop: 10 }}>
-                          {center.quickResume.supportLine}
-                        </p>
-                      ) : null}
+                    </>
+                  )}
+                </div>
+              </section>
+
+              <section className="aprova-panel-soft is-large aprova-dashboard-secondary-card">
+                <span className="aprova-profile-section-kicker">Missão</span>
+                <h3 className="aprova-dashboard-secondary-card__title">Missão do dia</h3>
+                <p className="aprova-dashboard-secondary-card__lede">
+                  Um bloco curto e realista para manter consistência hoje.
+                </p>
+                <div className="aprova-dash-missions-embed">
+                  <p className="aprova-dash-missions-embed__label">
+                    {loading ? "Checklist diário" : center?.missionSnapshot?.progressLabel || "Checklist diário"}
+                  </p>
+                  {loading ? (
+                    <p className="aprova-dash-card-text-muted">Carregando…</p>
+                  ) : dailyMissions.length === 0 ? (
+                    <>
+                      <div className="aprova-dash-card-meta-row">
+                        <span className="aprova-dash-mini-pill">Pendente</span>
+                        <span className="aprova-dash-mini-pill aprova-dash-mini-pill--accent">Estudo</span>
+                      </div>
                       <p className="aprova-dash-card-text-muted">
-                        {center?.quickResume?.text || continueHint}
+                        Abra a aba Estudo — a Yara monta missões conforme seu concurso e hábito.
                       </p>
                     </>
                   ) : (
-                    <p className="aprova-dash-card-text-muted">{center?.quickResume?.text || continueHint}</p>
+                    <>
+                      <div className="aprova-dash-card-meta-row">
+                        <span className="aprova-dash-mini-pill aprova-dash-mini-pill--accent">
+                          {missionStats.done}/{missionStats.total} ok
+                        </span>
+                        <span className="aprova-dash-mini-pill">{missionStats.pct}%</span>
+                      </div>
+                      <p className="aprova-dash-card-text-muted" style={{ marginTop: 8 }}>
+                        {center?.missionSnapshot?.text || dailyMissions[0]?.label}
+                      </p>
+                      <div className="aprova-dash-card-progress-line aprova-dash-card-progress-line--thin" aria-hidden>
+                        <div className="aprova-dash-card-progress-fill" style={{ width: `${missionStats.pct}%` }} />
+                      </div>
+                      <div className="aprova-dash-mission-task-list">
+                        {dailyMissions.map((m) => {
+                          const actionable = Boolean(m.action && onMissionAction);
+                          const short = missionShortLabel(m);
+                          return (
+                            <button
+                              key={m.id}
+                              type="button"
+                              disabled={m.done || !actionable}
+                              title={m.label}
+                              onClick={() => actionable && onMissionAction?.(m)}
+                              className={`aprova-dash-mission-task-item ${m.done ? "aprova-dash-mission-task-item--done" : ""}`}
+                            >
+                              <span className="aprova-dash-mission-task-dot" aria-hidden>
+                                {m.done ? "✓" : ""}
+                              </span>
+                              <span>{short}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                      {firstPendingMission ? (
+                        <div className="aprova-dash-ai-hero-cta" style={{ marginTop: 10 }}>
+                          <button
+                            type="button"
+                            onClick={() => onMissionAction?.(firstPendingMission)}
+                            className="aprova-btn-interactive"
+                            style={{ ...styles.dashV2ActionBtn, ...styles.dashV2ActionBtnGreen, padding: "12px 10px" }}
+                          >
+                            Ir para missão
+                            <span style={styles.dashV2ActionSub}>CTA claro</span>
+                          </button>
+                        </div>
+                      ) : null}
+                    </>
                   )}
-                  <div className="aprova-dash-ai-hero-cta" style={{ marginTop: 18 }}>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        onResumeAction?.(resumeJourney?.primaryAction || center?.nextBestStep?.ctaAction || "study_now")
-                      }
-                      className="aprova-btn-interactive aprova-dash-organic-btn-strong aprova-dash-ai-cta-primary"
-                      style={styles.dashV2ContinuePrimaryBtn}
-                    >
-                      {resumeJourney?.primaryLabel || "Continuar estudo"}
-                    </button>
-                    {(center?.quickResume?.quickActions?.length ? center.quickResume.quickActions : [])
-                      .filter((action) => action?.id && action.id !== (resumeJourney?.primaryAction || "study_now"))
-                      .slice(0, 2)
-                      .map((action) => (
-                      <button
-                        key={action.id}
-                        type="button"
-                        onClick={() => onResumeAction?.(action.id)}
-                        className="aprova-btn-interactive aprova-dash-organic-btn-strong aprova-dash-ai-cta-secondary"
-                        style={styles.dashV2ContinueSecondaryBtn}
-                      >
-                        {action.label}
-                      </button>
-                    ))}
-                    {!center?.quickResume?.quickActions?.length ? (
-                      <button
-                        type="button"
-                        onClick={onOpenStudyTab}
-                        className="aprova-btn-interactive aprova-dash-organic-btn-strong aprova-dash-ai-cta-secondary"
-                        style={styles.dashV2ContinueSecondaryBtn}
-                      >
-                        Ver matérias
-                      </button>
-                    ) : null}
-                  </div>
-                </>
-              )}
-            </section>
-
-            {nextFocusPanel}
-
-            {momentPanel}
-
-            {progressPill}
-
-            <div className="aprova-dash-organic-panel aprova-dash-organic-missions aprova-dash-organic-band-mission aprova-dash-card-skin aprova-dash-span-6 aprova-dash-card--half">
-              <span className="aprova-dash-card-kicker">Missão de hoje</span>
-              <h3 className="aprova-dash-card-heading-sm">
-                {loading ? "Checklist diário" : center?.missionSnapshot?.progressLabel || "Checklist diário"}
-              </h3>
-              {loading ? (
-                <p className="aprova-dash-card-text-muted">Carregando…</p>
-              ) : dailyMissions.length === 0 ? (
-                <>
-                  <div className="aprova-dash-card-meta-row">
-                    <span className="aprova-dash-mini-pill">Pendente</span>
-                    <span className="aprova-dash-mini-pill aprova-dash-mini-pill--accent">Estudo</span>
-                  </div>
-                  <p className="aprova-dash-card-text-muted">
-                    Abra a aba Estudo — a Yara monta missões conforme seu concurso e hábito.
-                  </p>
-                </>
-              ) : (
-                <>
-                  <div className="aprova-dash-card-meta-row">
-                    <span className="aprova-dash-mini-pill aprova-dash-mini-pill--accent">
-                      {missionStats.done}/{missionStats.total} ok
-                    </span>
-                    <span className="aprova-dash-mini-pill">{missionStats.pct}%</span>
-                  </div>
-                  <p className="aprova-dash-card-text-muted" style={{ marginTop: 10 }}>
-                    {center?.missionSnapshot?.text || dailyMissions[0]?.label}
-                  </p>
-                  <div className="aprova-dash-card-progress-line aprova-dash-card-progress-line--thin" aria-hidden>
-                    <div className="aprova-dash-card-progress-fill" style={{ width: `${missionStats.pct}%` }} />
-                  </div>
-                  <div className="aprova-dash-mission-task-list">
-                    {dailyMissions.map((m) => {
-                      const actionable = Boolean(m.action && onMissionAction);
-                      const short = missionShortLabel(m);
-                      return (
-                        <button
-                          key={m.id}
-                          type="button"
-                          disabled={m.done || !actionable}
-                          title={m.label}
-                          onClick={() => actionable && onMissionAction?.(m)}
-                          className={`aprova-dash-mission-task-item ${m.done ? "aprova-dash-mission-task-item--done" : ""}`}
-                        >
-                          <span className="aprova-dash-mission-task-dot" aria-hidden>
-                            {m.done ? "✓" : ""}
-                          </span>
-                          <span>{short}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                  {firstPendingMission ? (
-                    <div className="aprova-dash-ai-hero-cta" style={{ marginTop: 14 }}>
-                      <button
-                        type="button"
-                        onClick={() => onMissionAction?.(firstPendingMission)}
-                        className="aprova-btn-interactive"
-                        style={{ ...styles.dashV2ActionBtn, ...styles.dashV2ActionBtnGreen, padding: "12px 10px" }}
-                      >
-                        Ir para missão
-                        <span style={styles.dashV2ActionSub}>CTA claro</span>
-                      </button>
-                    </div>
-                  ) : null}
-                </>
-              )}
-            </div>
-
-            <div className="aprova-dash-equal-stack">{streakPill}{revisionTrainPanel}</div>
+                </div>
+              </section>
 
             {yaraRecommendationPanel}
 
-            {evolutionPanel}
+            {momentPanel}
+
+            {rhythmPanel}
 
             {historyPanel}
 
             {subjectAside ? (
-              <section className="aprova-dash-organic-panel aprova-dash-organic-subjects aprova-dash-organic-band-flow aprova-dash-card-skin aprova-dash-span-6 aprova-dash-subjects-aside aprova-dash-card--half">
+              <section className="aprova-panel-soft is-large aprova-dash-organic-subjects aprova-dashboard-secondary-card aprova-dash-subjects-aside">
                 <span className="aprova-dash-section-kicker">Matérias em foco</span>
                 <h2 className="aprova-dash-section-heading aprova-dash-section-heading--sm">Progresso por matéria</h2>
                 <div className="aprova-dash-card-meta-row">

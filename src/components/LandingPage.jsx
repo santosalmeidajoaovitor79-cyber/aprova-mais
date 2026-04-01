@@ -90,6 +90,9 @@ function LandingPageComponent({ onStartRegister, onStartLogin, onSelectPricingPl
             A maioria das pessoas se perde porque não sabe o que fazer depois de abrir o material.
             A Yara lê o seu momento e te guia passo a passo até a prova, com clareza.
           </p>
+          <p className="aprova-ai-hint aprova-landing-ai-hint aprova-reveal-2">
+            Produto pensado para aprovação: IA premium, ritmo humano e direção até o dia da prova.
+          </p>
 
           <div className="aprova-landing-pill-row aprova-reveal-3">
             {trustPills.map((item) => (

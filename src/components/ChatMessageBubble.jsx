@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { Sparkles, User } from "lucide-react";
+import { User } from "lucide-react";
 
 /** Assistente do Aprova+ â€” identidade fixa do chat. */
 export const YARA_NAME = "Yara";
@@ -30,8 +30,8 @@ function ChatMessageBubbleComponent({ role, content, timestamp, userName = "VocÃ
       className={`aprova-chat-row aprova-chat-row-enter ${isAssistant ? "aprova-chat-row-assistant" : "aprova-chat-row-user"}${rich ? " aprova-chat-row--rich" : ""}`}
     >
       {isAssistant ? (
-        <div className="aprova-chat-avatar aprova-chat-avatar-yara" aria-hidden="true">
-          <Sparkles size={18} strokeWidth={2.2} />
+        <div className="aprova-chat-avatar aprova-chat-avatar-yara aprova-chat-avatar-yara--premium" aria-hidden="true">
+          <span className="aprova-chat-avatar-letter">Y</span>
         </div>
       ) : null}
 

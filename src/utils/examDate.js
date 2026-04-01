@@ -351,7 +351,6 @@ export function buildFullAiPayload(examDateStr, contest, subject, topic, learner
       contestName,
       subjectName,
       topicName,
-      ...(contest?.source_catalog_id ? { contestCatalogId: contest.source_catalog_id } : {}),
       ...(subject?.weight != null ? { subjectWeight: Number(subject.weight) } : {}),
       ...(subject?.display_order != null ? { subjectDisplayOrder: Number(subject.display_order) } : {}),
       ...(topic?.weight != null ? { topicWeight: Number(topic.weight) } : {}),

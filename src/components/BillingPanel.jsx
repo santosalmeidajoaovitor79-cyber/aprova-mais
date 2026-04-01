@@ -1,6 +1,7 @@
 import { memo, useEffect, useMemo, useState } from "react";
 import { CheckCircle2, Crown, CreditCard, Sparkles } from "lucide-react";
 import { BILLING_PLANS, getBillingPrice } from "../lib/billing.js";
+import { AiHint } from "./AiHint.jsx";
 
 function BillingPanelComponent({
   subscription,
@@ -26,7 +27,7 @@ function BillingPanelComponent({
   }, [access?.billingCycle]);
 
   return (
-    <section className="aprova-panel-soft is-large aprova-billing-panel">
+    <section className="aprova-panel-soft is-large aprova-billing-panel aprova-billing-panel--premium">
       <div className="aprova-billing-head">
         <div>
           <span className="aprova-profile-section-kicker">Assinatura</span>
@@ -35,6 +36,9 @@ function BillingPanelComponent({
             Assine com Stripe Checkout, depois gerencie upgrade, downgrade e ciclo no Customer
             Portal sem sair da estrutura atual do app.
           </p>
+          <AiHint>
+            A Yara mantém seu plano alinhado ao que você usa — upgrade ou ciclo em um clique no portal.
+          </AiHint>
         </div>
         <div className="aprova-billing-current">
           <span>{currentPlanLabel}</span>
@@ -112,7 +116,7 @@ function BillingPanelComponent({
 
               <button
                 type="button"
-                className="aprova-organic-primary-btn"
+                className="aprova-organic-primary-btn aprova-billing-plan-cta"
                 disabled={loading || checkoutBusy || (isCurrent && portalBusy)}
                 onClick={() => {
                   if (isCurrent) {

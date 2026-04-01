@@ -1,6 +1,7 @@
 import { memo, useMemo, useState } from "react";
 import { ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
 import { BILLING_PLANS, getBillingPrice } from "../lib/billing.js";
+import { AiHint } from "./AiHint.jsx";
 
 function PricingSectionComponent({
   loggedIn = false,
@@ -23,6 +24,9 @@ function PricingSectionComponent({
           Checkout no Stripe para a primeira compra. Portal do cliente para upgrade, downgrade e
           troca entre mensal e anual.
         </p>
+        <AiHint className="aprova-pricing-ai-hint">
+          Planos pensados para evolução contínua — a Yara ganha profundidade conforme você sobe de nível.
+        </AiHint>
       </div>
 
       <div className="aprova-pricing-toggle" role="tablist" aria-label="Ciclo de cobrança">

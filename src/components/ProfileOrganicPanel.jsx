@@ -1,6 +1,7 @@
 import { memo, useMemo, useState } from "react";
 import { goals } from "../constants/appConstants.js";
 import { BillingPanel } from "./BillingPanel.jsx";
+import { AiHint } from "./AiHint.jsx";
 
 function ProfileOrganicPanelComponent({
   name,
@@ -108,6 +109,9 @@ function ProfileOrganicPanelComponent({
                   Olá, <strong className="aprova-profile-title-inline">{displayName}</strong> — acompanhe sua prova em
                   foco, constância e próximo passo sem perder contexto.
                 </p>
+                <AiHint className="aprova-profile-hero-ai-hint">
+                  A Yara cruza prova, ritmo e histórico para sugerir o melhor próximo passo no Estudo.
+                </AiHint>
                 <p className="aprova-profile-subtitle-secondary">
                   {examName !== "Defina seu concurso"
                     ? [
