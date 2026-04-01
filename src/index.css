@@ -8605,9 +8605,9 @@ body {
 /* Dashboard: grid 12 col — densidade, alturas alinhadas, menos “buracos” */
 .aprova-dash-main-grid {
   display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 14px;
-  align-items: stretch;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  align-items: start;
 }
 
 @media (min-width: 900px) {
@@ -8623,6 +8623,21 @@ body {
 }
 
 .aprova-dash-main-grid > * {
+  min-width: 0;
+}
+
+.aprova-dash-main-grid-top,
+.aprova-dash-main-grid-body {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.aprova-dash-column {
+  display: grid;
+  gap: 16px;
+  align-content: start;
   min-width: 0;
 }
 
@@ -8652,11 +8667,17 @@ body {
 }
 
 @media (max-width: 1100px) {
+  .aprova-dash-main-grid-top,
+  .aprova-dash-main-grid-body {
+    grid-template-columns: 1fr;
+  }
+
   .aprova-dash-span-8,
   .aprova-dash-span-4,
   .aprova-dash-span-6,
   .aprova-dash-span-12,
-  .aprova-dash-equal-stack {
+  .aprova-dash-equal-stack,
+  .aprova-dash-column {
     grid-column: span 12;
   }
 

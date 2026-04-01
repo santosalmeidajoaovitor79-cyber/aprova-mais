@@ -503,7 +503,8 @@ function DashboardStudyHubComponent({
           />
 
           <div className="aprova-dash-main-grid aprova-dash-main-grid--tight">
-            <section className="aprova-dash-organic-panel aprova-dash-organic-continue aprova-dash-organic-band-primary aprova-dash-card-skin aprova-dash-span-8 aprova-dash-card--hero">
+            <div className="aprova-dash-main-grid-top">
+              <section className="aprova-dash-organic-panel aprova-dash-organic-continue aprova-dash-organic-band-primary aprova-dash-card-skin aprova-dash-span-8 aprova-dash-card--hero">
               <span className="aprova-dash-card-kicker">{center?.quickResume?.title || "Retomada rápida"}</span>
               <h2 className="aprova-dash-card-heading">
                 {loading ? "Carregando…" : center?.quickResume?.headline || "Continue exatamente do ponto certo"}
@@ -589,15 +590,16 @@ function DashboardStudyHubComponent({
                   </div>
                 </>
               )}
-            </section>
+              </section>
 
-            {nextFocusPanel}
+              {nextFocusPanel}
+            </div>
 
-            {momentPanel}
+            <div className="aprova-dash-main-grid-body">
+              <div className="aprova-dash-column">
+                {momentPanel}
 
-            {progressPill}
-
-            <div className="aprova-dash-organic-panel aprova-dash-organic-missions aprova-dash-organic-band-mission aprova-dash-card-skin aprova-dash-span-6 aprova-dash-card--half">
+                <div className="aprova-dash-organic-panel aprova-dash-organic-missions aprova-dash-organic-band-mission aprova-dash-card-skin aprova-dash-span-6 aprova-dash-card--half">
               <span className="aprova-dash-card-kicker">Missão de hoje</span>
               <h3 className="aprova-dash-card-heading-sm">
                 {loading ? "Checklist diário" : center?.missionSnapshot?.progressLabel || "Checklist diário"}
@@ -664,40 +666,46 @@ function DashboardStudyHubComponent({
                   ) : null}
                 </>
               )}
+                </div>
+
+                {evolutionPanel}
+              </div>
+
+              <div className="aprova-dash-column">
+                {progressPill}
+
+                <div className="aprova-dash-equal-stack">{streakPill}{revisionTrainPanel}</div>
+
+                {yaraRecommendationPanel}
+
+                {historyPanel}
+
+                {subjectAside ? (
+                  <section className="aprova-dash-organic-panel aprova-dash-organic-subjects aprova-dash-organic-band-flow aprova-dash-card-skin aprova-dash-span-6 aprova-dash-subjects-aside aprova-dash-card--half">
+                    <span className="aprova-dash-section-kicker">Matérias em foco</span>
+                    <h2 className="aprova-dash-section-heading aprova-dash-section-heading--sm">Progresso por matéria</h2>
+                    <div className="aprova-dash-card-meta-row">
+                      <span className="aprova-dash-mini-pill">{subjectProgress.length} matérias</span>
+                      <span className="aprova-dash-mini-pill aprova-dash-mini-pill--accent">Principal</span>
+                    </div>
+                    <div style={{ ...styles.dashV2SubjectsScroll, maxWidth: "100%" }}>
+                      {subjectProgress.map((s) => {
+                        const pct = Math.min(100, Math.max(0, s.pct ?? 0));
+                        return (
+                          <div key={s.subjectId} style={styles.dashV2SubjectPill} title={s.name}>
+                            <p style={styles.dashV2SubjectPillName}>{s.name}</p>
+                            <p style={{ margin: "0 0 6px 0", fontSize: 18, fontWeight: 900, color: "#86efac" }}>{pct}%</p>
+                            <div style={styles.dashV2SubjectPillBar}>
+                              <div className="aprova-dash-progress-fill" style={{ width: `${pct}%`, height: "100%", borderRadius: 999 }} />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </section>
+                ) : null}
+              </div>
             </div>
-
-            <div className="aprova-dash-equal-stack">{streakPill}{revisionTrainPanel}</div>
-
-            {yaraRecommendationPanel}
-
-            {evolutionPanel}
-
-            {historyPanel}
-
-            {subjectAside ? (
-              <section className="aprova-dash-organic-panel aprova-dash-organic-subjects aprova-dash-organic-band-flow aprova-dash-card-skin aprova-dash-span-6 aprova-dash-subjects-aside aprova-dash-card--half">
-                <span className="aprova-dash-section-kicker">Matérias em foco</span>
-                <h2 className="aprova-dash-section-heading aprova-dash-section-heading--sm">Progresso por matéria</h2>
-                <div className="aprova-dash-card-meta-row">
-                  <span className="aprova-dash-mini-pill">{subjectProgress.length} matérias</span>
-                  <span className="aprova-dash-mini-pill aprova-dash-mini-pill--accent">Principal</span>
-                </div>
-                <div style={{ ...styles.dashV2SubjectsScroll, maxWidth: "100%" }}>
-                  {subjectProgress.map((s) => {
-                    const pct = Math.min(100, Math.max(0, s.pct ?? 0));
-                    return (
-                      <div key={s.subjectId} style={styles.dashV2SubjectPill} title={s.name}>
-                        <p style={styles.dashV2SubjectPillName}>{s.name}</p>
-                        <p style={{ margin: "0 0 6px 0", fontSize: 18, fontWeight: 900, color: "#86efac" }}>{pct}%</p>
-                        <div style={styles.dashV2SubjectPillBar}>
-                          <div className="aprova-dash-progress-fill" style={{ width: `${pct}%`, height: "100%", borderRadius: 999 }} />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </section>
-            ) : null}
 
             {planWideCard}
           </div>
