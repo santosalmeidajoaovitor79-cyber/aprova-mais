@@ -5844,7 +5844,7 @@ body {
 
 .aprova-study-topic-explanation-scroll--framed {
   flex: 1;
-  min-height: 0;
+  min-height: clamp(260px, 30vh, 360px);
   padding: 22px 26px 28px;
 }
 
@@ -8085,8 +8085,8 @@ body {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   gap: clamp(18px, 3vw, 32px);
-  padding: clamp(22px, 3vw, 32px) clamp(20px, 3vw, 36px);
-  align-items: start;
+  padding: clamp(28px, 3.5vw, 40px) clamp(22px, 3vw, 40px);
+  align-items: center;
 }
 
 @media (max-width: 720px) {
@@ -8575,15 +8575,15 @@ body {
 }
 
 .aprova-dash-card--hero {
-  min-height: 220px;
+  min-height: 290px;
 }
 
 .aprova-dash-card--side {
-  min-height: 220px;
+  min-height: 290px;
 }
 
 .aprova-dash-card--half {
-  min-height: 248px;
+  min-height: 270px;
 }
 
 .aprova-dash-card--wide {
@@ -8591,7 +8591,7 @@ body {
 }
 
 .aprova-dash-card--compact {
-  min-height: 150px;
+  min-height: 190px;
 }
 
 .aprova-chat-row-user .aprova-chat-bubble {
@@ -8634,6 +8634,10 @@ body {
   align-items: start;
 }
 
+.aprova-dash-main-grid-top--featured > * {
+  min-height: 290px;
+}
+
 .aprova-dash-column {
   display: grid;
   gap: 16px;
@@ -8670,6 +8674,10 @@ body {
   .aprova-dash-main-grid-top,
   .aprova-dash-main-grid-body {
     grid-template-columns: 1fr;
+  }
+
+  .aprova-dash-main-grid-top--featured > * {
+    min-height: 0;
   }
 
   .aprova-dash-span-8,

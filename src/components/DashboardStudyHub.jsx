@@ -503,7 +503,7 @@ function DashboardStudyHubComponent({
           />
 
           <div className="aprova-dash-main-grid aprova-dash-main-grid--tight">
-            <div className="aprova-dash-main-grid-top">
+            <div className="aprova-dash-main-grid-top aprova-dash-main-grid-top--featured">
               <section className="aprova-dash-organic-panel aprova-dash-organic-continue aprova-dash-organic-band-primary aprova-dash-card-skin aprova-dash-span-8 aprova-dash-card--hero">
               <span className="aprova-dash-card-kicker">{center?.quickResume?.title || "Retomada rápida"}</span>
               <h2 className="aprova-dash-card-heading">
