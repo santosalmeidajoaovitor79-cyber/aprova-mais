@@ -6111,7 +6111,7 @@ body {
   display: flex;
   flex-direction: column;
   flex: 1;
-  min-height: 0;
+  min-height: clamp(260px, 30vh, 360px);
   margin-top: 6px;
   border-radius: 30px;
   border: 1px solid var(--aprova-border);
