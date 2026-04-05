@@ -8645,6 +8645,14 @@ body {
   align-items: start;
 }
 
+.aprova-dash-main-grid-top > *,
+.aprova-dash-main-grid-body > *,
+.aprova-dash-column > *,
+.aprova-dash-equal-stack {
+  grid-column: auto !important;
+  min-width: 0;
+}
+
 .aprova-dash-main-grid-top--featured > * {
   min-height: 290px;
 }
