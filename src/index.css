@@ -13,7 +13,7 @@
   --aprova-space-md: 18px;
   --aprova-title-xl: clamp(34px, 4vw, 56px);
   --aprova-title-lg: clamp(24px, 3vw, 34px);
-  --aprova-text: 16px;
+  --aprova-font-base: 16px;
   --aprova-shadow-cta: 0 10px 36px rgba(124, 58, 237, 0.38);
   --aprova-landing-stagger: 120ms;
   /* Sistema visual premium (dark + lilás) */
@@ -88,7 +88,7 @@
 .aprova-study-topic-hero-lead,
 .aprova-pricing-heading p,
 .aprova-section-heading p {
-  font-size: var(--aprova-text);
+  font-size: var(--aprova-font-base);
 }
 
 /* Screen-reader only — títulos de região sem duplicar layout visual */
