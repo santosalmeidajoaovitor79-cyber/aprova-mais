@@ -1,5 +1,4 @@
 import { memo, useEffect, useMemo, useRef, useState } from "react";
-import { DashboardAiHero } from "./DashboardAiHero.jsx";
 import { styles } from "../styles/appStyles.js";
 import { computeDaysUntilExam } from "../utils/examDate.js";
 import { PremiumFeatureCard } from "./PremiumFeatureCard.jsx";
@@ -489,21 +488,38 @@ function DashboardStudyHubComponent({
       <div className="aprova-dashboard-organic-inner aprova-container">
         <div className="aprova-dashboard-flow">
           <div className="aprova-dash-page-grid">
-          <DashboardAiHero
-            loading={loading}
-            firstName={fn}
-            vibeLine={vibe}
-            mainExamName={mainExamName}
-            examCountdownText={examCountdownText}
-            overallProgressPct={overallProgressPct}
-            studyNowHint={studyNowHint}
-            suggestionShort={suggestion || ""}
-            dailyFocusLabel={dailyFocusLabel}
-            onStudyNow={onStudyNow}
-            onOpenStudyTab={onOpenStudyTab}
-          />
+            <section className="aprova-dashboard-hero-main">
+              <div className="aprova-dashboard-hero-main__content">
+                <span className="aprova-profile-section-kicker">Plano ativo da Yara</span>
+                <h1>{loading ? "Organizando seu próximo passo…" : center?.quickResume?.headline || "Seu próximo passo está claro"}</h1>
+                <p>{loading ? "Carregando contexto do seu estudo…" : center?.quickResume?.text || continueHint}</p>
+                <p className="aprova-ai-hint">
+                  {loading
+                    ? "A Yara está ajustando sua trilha."
+                    : center?.nextBestStep?.text ||
+                      suggestion ||
+                      "A Yara ajustou sua rota com base no seu progresso recente."}
+                </p>
+                <div className="aprova-dashboard-hero-main__actions">
+                  <button
+                    type="button"
+                    className="aprova-organic-primary-btn"
+                    onClick={() => onResumeAction?.(resumeJourney?.primaryAction || center?.nextBestStep?.ctaAction || "study_now")}
+                  >
+                    {resumeJourney?.primaryLabel || "Continuar estudo"}
+                  </button>
+                  <button
+                    type="button"
+                    className="aprova-organic-secondary-btn"
+                    onClick={onOpenStudyTab}
+                  >
+                    Ver plano completo
+                  </button>
+                </div>
+              </div>
+            </section>
 
-          <div className="aprova-dash-main-grid aprova-dash-main-grid--tight">
+            <div className="aprova-dash-main-grid aprova-dashboard-grid">
             <div className="aprova-dash-main-grid-top aprova-dash-main-grid-top--featured">
               <section className="aprova-dash-organic-panel aprova-dash-organic-continue aprova-dash-organic-band-primary aprova-dash-card-skin aprova-dash-span-8 aprova-dash-card--hero">
               <span className="aprova-dash-card-kicker">{center?.quickResume?.title || "Retomada rápida"}</span>
