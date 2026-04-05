@@ -486,8 +486,9 @@ function DashboardStudyHubComponent({
 
   return (
     <section className="aprova-dashboard-organic">
-      <div className="aprova-dashboard-organic-inner aprova-shell-wide">
-        <div className="aprova-dash-page-grid">
+      <div className="aprova-dashboard-organic-inner aprova-container">
+        <div className="aprova-dashboard-flow">
+          <div className="aprova-dash-page-grid">
           <DashboardAiHero
             loading={loading}
             firstName={fn}
@@ -716,6 +717,7 @@ function DashboardStudyHubComponent({
             {missionToast.text}
           </div>
         ) : null}
+        </div>
       </div>
     </section>
   );

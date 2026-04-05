@@ -7344,6 +7344,19 @@ body {
   z-index: 2;
 }
 
+.aprova-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  box-sizing: border-box;
+}
+
+.aprova-dashboard-flow {
+  width: 100%;
+  margin: 0 auto;
+}
+
 .aprova-profile-bg-glow {
   position: absolute;
   border-radius: 999px;
@@ -8028,18 +8041,16 @@ body {
 }
 
 .aprova-dash-page-grid {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 18px;
-  align-items: stretch;
+  display: block;
+  width: 100%;
 }
 
 .aprova-dash-page-grid > .aprova-dash-ai-hero {
-  grid-column: 1 / -1;
+  margin-bottom: 18px;
 }
 
 .aprova-dash-page-grid > .aprova-dash-main-grid {
-  grid-column: 1 / -1;
+  width: 100%;
 }
 
 .aprova-dash-main-grid--tight {
