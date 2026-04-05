@@ -8049,10 +8049,14 @@ body {
   width: 100%;
 }
 
+.aprova-dashboard-page {
+  display: grid;
+  gap: 24px;
+}
+
 .aprova-dashboard-hero-main {
   border-radius: 28px;
   padding: 30px 32px;
-  margin-bottom: 20px;
   background:
     radial-gradient(circle at top right, rgba(167, 139, 250, 0.14), transparent 28%),
     linear-gradient(145deg, rgba(17, 24, 39, 0.96), rgba(10, 10, 16, 0.98));
@@ -8064,7 +8068,7 @@ body {
   max-width: 760px;
 }
 
-.aprova-dashboard-hero-main h1 {
+.aprova-dashboard-hero-main__title {
   margin: 10px 0 12px;
   font-size: clamp(34px, 4vw, 52px);
   line-height: 1.03;
@@ -8072,8 +8076,9 @@ body {
   color: #f8fafc;
 }
 
-.aprova-dashboard-hero-main p {
+.aprova-dashboard-hero-main__description {
   margin: 0;
+  max-width: 60ch;
   color: #cbd5e1;
   line-height: 1.6;
 }
@@ -8094,6 +8099,25 @@ body {
   font-size: 1rem;
 }
 
+.aprova-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.aprova-dashboard-grid > * {
+  min-width: 0;
+}
+
+.aprova-dashboard-grid-span-2 {
+  grid-column: 1 / -1;
+}
+
+.aprova-dashboard-grid [class*="aprova-dash-span-"] {
+  grid-column: auto !important;
+}
+
 .aprova-dashboard-grid .aprova-dash-card-text-clamp {
   font-size: 0.88rem;
   -webkit-line-clamp: 4;
@@ -8102,6 +8126,10 @@ body {
 @media (max-width: 900px) {
   .aprova-dashboard-grid {
     grid-template-columns: 1fr;
+  }
+
+  .aprova-dashboard-grid-span-2 {
+    grid-column: auto;
   }
 }
 
