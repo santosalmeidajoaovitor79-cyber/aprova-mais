@@ -543,6 +543,15 @@ function DashboardStudyHubComponent({
                   ? `${resumeJourney.topicName || resumeTopicShort || "Último tópico"} · ${resumeJourney.whereLine}.`
                   : center?.quickResume?.text || continueHint}
             </p>
+            <div className="aprova-dashboard-section__actions">
+              <button
+                type="button"
+                className="aprova-organic-primary-btn"
+                onClick={() => onResumeAction?.(resumeJourney?.primaryAction || center?.nextBestStep?.ctaAction || "study_now")}
+              >
+                Retomar agora
+              </button>
+            </div>
           </section>
 
           <section className="aprova-dashboard-section">
