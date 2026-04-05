@@ -8049,9 +8049,9 @@ body {
   width: 100%;
 }
 
-.aprova-dashboard-page {
+.aprova-dashboard-editorial {
   display: grid;
-  gap: 24px;
+  gap: 20px;
 }
 
 .aprova-dashboard-hero-main {
@@ -8095,41 +8095,77 @@ body {
   margin-top: 22px;
 }
 
-.aprova-dashboard-grid .aprova-dash-card-heading-sm {
-  font-size: 1rem;
+.aprova-dashboard-strip,
+.aprova-dashboard-section,
+.aprova-dashboard-hero-main {
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(145deg, rgba(17, 24, 39, 0.96), rgba(10, 10, 16, 0.98));
 }
 
-.aprova-dashboard-grid {
+.aprova-dashboard-strip {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 20px;
-  align-items: start;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 18px 22px;
 }
 
-.aprova-dashboard-grid > * {
-  min-width: 0;
+.aprova-dashboard-strip strong {
+  display: block;
+  font-size: 1.35rem;
+  color: #f8fafc;
 }
 
-.aprova-dashboard-grid-span-2 {
-  grid-column: 1 / -1;
+.aprova-dashboard-strip span {
+  color: #cbd5e1;
+  font-size: 0.9rem;
 }
 
-.aprova-dashboard-grid [class*="aprova-dash-span-"] {
-  grid-column: auto !important;
+.aprova-dashboard-section {
+  padding: 24px;
 }
 
-.aprova-dashboard-grid .aprova-dash-card-text-clamp {
-  font-size: 0.88rem;
-  -webkit-line-clamp: 4;
+.aprova-dashboard-section h2 {
+  margin: 8px 0 10px;
+  color: #f8fafc;
+  font-size: clamp(1.2rem, 1.9vw, 1.6rem);
+}
+
+.aprova-dashboard-section p {
+  margin: 0;
+  color: #cbd5e1;
+  line-height: 1.6;
+}
+
+.aprova-action-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.aprova-action-row {
+  width: 100%;
+  text-align: left;
+  min-height: 52px;
+  padding: 0 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: #f8fafc;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.aprova-dashboard-route-list {
+  margin: 0;
+  padding-left: 18px;
+  color: #cbd5e1;
+  line-height: 1.7;
 }
 
 @media (max-width: 900px) {
-  .aprova-dashboard-grid {
+  .aprova-dashboard-strip {
     grid-template-columns: 1fr;
-  }
-
-  .aprova-dashboard-grid-span-2 {
-    grid-column: auto;
   }
 }
 
