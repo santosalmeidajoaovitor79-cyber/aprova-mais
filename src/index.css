@@ -6,8 +6,14 @@
   --aprova-duration: 220ms;
   --aprova-easing: cubic-bezier(0.22, 1, 0.36, 1);
   --aprova-radius-md: 18px;
-  --aprova-radius-lg: 22px;
+  --aprova-radius-lg: 24px;
   --aprova-radius-xl: 28px;
+  --aprova-space-xl: 32px;
+  --aprova-space-lg: 24px;
+  --aprova-space-md: 18px;
+  --aprova-title-xl: clamp(34px, 4vw, 56px);
+  --aprova-title-lg: clamp(24px, 3vw, 34px);
+  --aprova-text: 16px;
   --aprova-shadow-cta: 0 10px 36px rgba(124, 58, 237, 0.38);
   --aprova-landing-stagger: 120ms;
   /* Sistema visual premium (dark + lilás) */
@@ -24,6 +30,65 @@
   --aprova-glow: rgba(139, 92, 246, 0.22);
   --aprova-shadow-soft: 0 20px 60px rgba(0, 0, 0, 0.35);
   --aprova-shadow-panel: 0 22px 56px rgba(0, 0, 0, 0.32);
+}
+
+.aprova-profile-section-kicker,
+.aprova-profile-kicker,
+.aprova-landing-kicker,
+.aprova-pricing-kicker,
+.aprova-study-topic-side-kicker,
+.aprova-dashboard-section .aprova-profile-section-kicker {
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #c4b5fd;
+}
+
+.aprova-dashboard-hero-main,
+.aprova-dashboard-section,
+.aprova-profile-hero-wrap,
+.aprova-billing-panel,
+.aprova-landing-hero,
+.aprova-landing-section,
+.aprova-pricing-section,
+.aprova-study-topic-hero,
+.aprova-study-topic-main,
+.aprova-study-topic-side {
+  border-radius: var(--aprova-radius-lg);
+}
+
+.aprova-dashboard-hero-main,
+.aprova-profile-hero-wrap,
+.aprova-study-topic-hero,
+.aprova-landing-hero {
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+}
+
+.aprova-dashboard-section,
+.aprova-billing-panel,
+.aprova-pricing-section,
+.aprova-landing-section,
+.aprova-study-topic-main,
+.aprova-study-topic-side {
+  box-shadow: 0 16px 46px rgba(0, 0, 0, 0.24);
+}
+
+.aprova-dashboard-section h2,
+.aprova-profile-section-title,
+.aprova-study-topic-hero-title,
+.aprova-pricing-heading h2,
+.aprova-section-heading h2 {
+  font-size: var(--aprova-title-lg);
+  letter-spacing: -0.02em;
+}
+
+.aprova-dashboard-section p,
+.aprova-profile-section-text,
+.aprova-study-topic-hero-lead,
+.aprova-pricing-heading p,
+.aprova-section-heading p {
+  font-size: var(--aprova-text);
 }
 
 /* Screen-reader only — títulos de região sem duplicar layout visual */
