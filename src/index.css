@@ -8116,17 +8116,15 @@ body {
 
 .aprova-dashboard-editorial {
   display: grid;
-  gap: 20px;
+  gap: 24px;
 }
 
 .aprova-dashboard-hero-main {
-  border-radius: 28px;
-  padding: 36px;
-  background:
-    radial-gradient(circle at top right, rgba(167, 139, 250, 0.14), transparent 28%),
-    linear-gradient(145deg, rgba(17, 24, 39, 0.96), rgba(10, 10, 16, 0.98));
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+  padding: 20px 0 24px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: none;
 }
 
 .aprova-dashboard-hero-main__content {
@@ -8164,22 +8162,15 @@ body {
 .aprova-dashboard-hero-main__actions .aprova-organic-primary-btn {
   min-height: 48px;
   padding-inline: 24px;
-  box-shadow: 0 14px 34px rgba(139, 92, 246, 0.34);
-}
-
-.aprova-dashboard-strip,
-.aprova-dashboard-section,
-.aprova-dashboard-hero-main {
-  border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: linear-gradient(145deg, rgba(17, 24, 39, 0.96), rgba(10, 10, 16, 0.98));
+  box-shadow: none;
 }
 
 .aprova-dashboard-strip {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
-  padding: 18px 22px;
+  padding: 6px 0 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .aprova-dashboard-strip > div {
@@ -8204,7 +8195,8 @@ body {
 }
 
 .aprova-dashboard-section {
-  padding: 24px;
+  padding: 2px 0 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .aprova-dashboard-section h2 {
@@ -8224,9 +8216,7 @@ body {
 }
 
 .aprova-dashboard-section:last-of-type {
-  background:
-    linear-gradient(180deg, rgba(167, 139, 250, 0.08), transparent 32%),
-    linear-gradient(145deg, rgba(17, 24, 39, 0.96), rgba(10, 10, 16, 0.98));
+  border-bottom: 0;
 }
 
 .aprova-action-list {
@@ -8241,8 +8231,8 @@ body {
   min-height: 52px;
   padding: 0 16px;
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.01);
   color: #f8fafc;
   font-family: inherit;
   cursor: pointer;

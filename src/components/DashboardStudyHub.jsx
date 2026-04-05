@@ -518,22 +518,6 @@ function DashboardStudyHubComponent({
           </section>
 
           <section className="aprova-dashboard-section">
-            <span className="aprova-profile-section-kicker">O que fazer agora</span>
-            <h2>Ações sugeridas</h2>
-            <div className="aprova-action-list">
-              <button className="aprova-action-row" type="button" onClick={onStudyNow}>
-                Abrir leitura guiada
-              </button>
-              <button className="aprova-action-row" type="button" onClick={onDoQuestions}>
-                Fazer questões do tópico
-              </button>
-              <button className="aprova-action-row" type="button" onClick={() => onResumeAction?.("chat")}>
-                Retomar conversa com a Yara
-              </button>
-            </div>
-          </section>
-
-          <section className="aprova-dashboard-section">
             <span className="aprova-profile-section-kicker">Retomada</span>
             <h2>Volte do ponto certo</h2>
             <p>
@@ -550,6 +534,22 @@ function DashboardStudyHubComponent({
                 onClick={() => onResumeAction?.(resumeJourney?.primaryAction || center?.nextBestStep?.ctaAction || "study_now")}
               >
                 Retomar agora
+              </button>
+            </div>
+          </section>
+
+          <section className="aprova-dashboard-section">
+            <span className="aprova-profile-section-kicker">O que fazer agora</span>
+            <h2>Ações sugeridas</h2>
+            <div className="aprova-action-list">
+              <button className="aprova-action-row" type="button" onClick={onStudyNow}>
+                Abrir leitura guiada
+              </button>
+              <button className="aprova-action-row" type="button" onClick={onDoQuestions}>
+                Fazer questões do tópico
+              </button>
+              <button className="aprova-action-row" type="button" onClick={() => onResumeAction?.("chat")}>
+                Retomar conversa com a Yara
               </button>
             </div>
           </section>
